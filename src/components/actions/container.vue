@@ -3,6 +3,7 @@
     <circle id="action-circle" />
     <g id="targets">
       <ActionTarget
+        ref="action-target"
         v-for="target in targets"
         :key="target.id"
         :id="target.id"
@@ -56,8 +57,8 @@ export default {
     },
   },
   created() {
-    this.addTarget(120, 255, 0, 0, 20, 6);
-    this.addTarget(240, 255, 0, 0, 20, 6);
+    this.addTarget(120, 255, 0, 0, 50, 30);
+    this.addTarget(240, 255, 0, 0, 50, 6);
     this.addTarget(0, 255, 0, 0, 20, 6);
   },
   methods: {
@@ -76,21 +77,16 @@ export default {
     },
     handleHit(angle) {
       return function (target) {
-        if (
-          angle >= target.criticalStartAngle &&
-          angle <= target.criticalEndAngle
-        ) {
+        const hit = target.checkHit(angle);
+        if (hit === "CRITICAL") {
           this.$emit("monsterHit", 10, true);
-        } else if (
-          angle >= target.defaultStartAngle &&
-          angle <= target.defaultEndAngle
-        ) {
+        } else if (hit === "HIT") {
           this.$emit("monsterHit", 1, false);
         }
       };
     },
     checkHit(angle) {
-      this.targets.forEach(this.handleHit(angle).bind(this));
+      this.$refs["action-target"].forEach(this.handleHit(angle).bind(this));
     },
     addShadow(angle) {
       this.shadows.push({
@@ -163,7 +159,7 @@ export default {
   r: 5px;
   fill: gray;
   transform-origin: 50% 50%;
-  animation: action-pointer-rotate 2s linear infinite;
+  animation: action-pointer-rotate 3s linear infinite;
 }
 
 @keyframes action-pointer-rotate {

@@ -37,10 +37,38 @@ export default {
     criticalStartAngle: Number,
     criticalEndAngle: Number,
   },
+  data: () => ({
+    active: false,
+  }),
+  mounted() {
+    this.active = true;
+  },
   methods: {
     arcColor(opacity) {
       if (!this.color) return `rgba(0, 0, 0, ${opacity})`;
       return `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${opacity})`;
+    },
+    checkHit(angle) {
+      if (!this.active) return undefined;
+
+      if (angle >= this.criticalStartAngle && angle <= this.criticalEndAngle) {
+        this.inactivateTemporarily(777);
+        return "CRITICAL";
+      } else if (
+        angle >= this.defaultStartAngle &&
+        angle <= this.defaultEndAngle
+      ) {
+        this.inactivateTemporarily(777);
+        return "HIT";
+      } else {
+        return undefined;
+      }
+    },
+    inactivateTemporarily(delay) {
+      setTimeout(() => {
+        this.active = true;
+      }, delay);
+      this.active = false;
     },
   },
 };
