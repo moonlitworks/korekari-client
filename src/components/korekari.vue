@@ -24,8 +24,8 @@ export default {
     interact() {
       this.$refs["action-container"].interact();
     },
-    monsterHit(damage) {
-      this.$refs["monster"].receiveDamage(damage);
+    monsterHit(damage, critical) {
+      this.$refs["monster"].receiveDamage(damage, critical);
     },
   },
 };

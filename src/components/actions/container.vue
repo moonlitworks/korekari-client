@@ -80,25 +80,17 @@ export default {
           angle >= target.criticalStartAngle &&
           angle <= target.criticalEndAngle
         ) {
-          this.$emit("monsterHit", 10);
+          this.$emit("monsterHit", 10, true);
         } else if (
           angle >= target.defaultStartAngle &&
           angle <= target.defaultEndAngle
         ) {
-          this.$emit("monsterHit", 1);
+          this.$emit("monsterHit", 1, false);
         }
       };
     },
     checkHit(angle) {
       this.targets.forEach(this.handleHit(angle).bind(this));
-
-      if (
-        this.targets.some(
-          (t) => angle >= t.defaultStartAngle && angle <= t.defaultEndAngle
-        )
-      ) {
-        this.$emit("monsterHit", 1);
-      }
     },
     addShadow(angle) {
       this.shadows.push({
