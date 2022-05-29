@@ -15,6 +15,12 @@ export default {
     transform() {
       return `rotate(${this.normalizedAngle(this.angle)}deg)`;
     },
+    pointerRadius() {
+      return `${this.thickness / 2}px`;
+    },
+    pointerRadiusEnd() {
+      return `${(this.thickness / 2) * 2}px`;
+    },
   },
   created() {
     setTimeout(() => {
@@ -33,7 +39,7 @@ export default {
 .action-pointer-shadow {
   cx: v-bind(radius);
   cy: v-bind(thickness);
-  r: 5px;
+  r: v-bind(pointerRadius);
   fill: gray;
   transform-origin: 50% 50%;
   transform: v-bind(transform);
@@ -42,10 +48,10 @@ export default {
 
 @keyframes action-pointer-pulse {
   0% {
-    r: 5px;
+    r: v-bind(pointerRadius);
   }
   100% {
-    r: 10px;
+    r: v-bind(pointerRadiusEnd);
     opacity: 0;
   }
 }

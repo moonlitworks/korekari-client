@@ -49,6 +49,18 @@ export default {
     shadows: [],
   }),
   computed: {
+    strokeWidth() {
+      return `${this.thickness}px`;
+    },
+    pointerRadius() {
+      return `${this.thickness / 2}px`;
+    },
+    pointerCY() {
+      return `${this.thickness}px`;
+    },
+    circleRadius() {
+      return `calc(50% - ${this.thickness}px)`;
+    },
     actionCircleRadius() {
       return (
         this.$refs["action-circle"]?.getBoundingClientRect().width / 2 +
@@ -135,8 +147,6 @@ export default {
 #action-container {
   position: absolute;
   display: inline-block;
-  max-width: 90vw;
-  max-height: 90vh;
   top: 50%;
   left: 50%;
   width: 500px;
@@ -152,16 +162,16 @@ export default {
 #action-circle {
   cx: 50%;
   cy: 50%;
-  r: calc(50% - 10px);
+  r: v-bind(circleRadius);
   stroke: #0001;
-  stroke-width: 10px;
+  stroke-width: v-bind(strokeWidth);
   fill: none;
 }
 
 #action-pointer {
   cx: 250;
-  cy: 10;
-  r: 5px;
+  cy: v-bind(pointerCY);
+  r: v-bind(pointerRadius);
   fill: gray;
   transform-origin: 50% 50%;
   animation: action-pointer-rotate 3s linear infinite;
