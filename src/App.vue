@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import KoreKari from "./components/KoreKari.vue";
+import KoreKari from "./components/korekari.vue";
 
 export default {
   name: "App",
