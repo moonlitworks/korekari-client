@@ -8,13 +8,13 @@
         :id="target.id"
         :radius="250"
         :thickness="thickness"
+        :color="target.color"
         :defaultStartAngle="target.defaultStartAngle"
         :defaultEndAngle="target.defaultEndAngle"
         :criticalStartAngle="target.criticalStartAngle"
         :criticalEndAngle="target.criticalEndAngle"
       />
     </g>
-    <circle id="action-pointer" ref="action-pointer" />
     <g id="shadows">
       <ActionPointerShadow
         v-for="shadow in shadows"
@@ -26,6 +26,7 @@
         @remove="removeShadow"
       />
     </g>
+    <circle id="action-pointer" ref="action-pointer" />
   </svg>
 </template>
 
@@ -43,15 +44,7 @@ export default {
     thickness: Number,
   },
   data: () => ({
-    targets: [
-      {
-        id: uuid.v4(),
-        defaultStartAngle: 260,
-        defaultEndAngle: 280,
-        criticalStartAngle: 267,
-        criticalEndAngle: 273,
-      },
-    ],
+    targets: [],
     shadows: [],
   }),
   computed: {
@@ -62,7 +55,25 @@ export default {
       );
     },
   },
+  created() {
+    this.addTarget(120, 255, 0, 0, 20, 6);
+    this.addTarget(240, 255, 0, 0, 20, 6);
+    this.addTarget(0, 255, 0, 0, 20, 6);
+  },
   methods: {
+    addTarget(angle, r, g, b, space, critSpace) {
+      this.targets.push({
+        id: uuid.v4(),
+        color: { r, g, b },
+        defaultStartAngle: this.clampAngle(angle - space / 2),
+        defaultEndAngle: this.clampAngle(angle + space / 2),
+        criticalStartAngle: this.clampAngle(angle - critSpace / 2),
+        criticalEndAngle: this.clampAngle(angle + critSpace / 2),
+      });
+    },
+    clampAngle(rawAngle) {
+      return rawAngle % 360;
+    },
     handleHit(angle) {
       return function (target) {
         if (
@@ -149,7 +160,7 @@ export default {
   cx: 50%;
   cy: 50%;
   r: calc(50% - 10px);
-  stroke: #fff5;
+  stroke: #0001;
   stroke-width: 10px;
   fill: none;
 }
@@ -158,7 +169,7 @@ export default {
   cx: 250;
   cy: 10;
   r: 5px;
-  fill: white;
+  fill: gray;
   transform-origin: 50% 50%;
   animation: action-pointer-rotate 2s linear infinite;
 }

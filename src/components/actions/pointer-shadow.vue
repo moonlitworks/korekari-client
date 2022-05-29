@@ -34,7 +34,7 @@ export default {
   cx: v-bind(radius);
   cy: v-bind(thickness);
   r: 5px;
-  fill: white;
+  fill: gray;
   transform-origin: 50% 50%;
   transform: v-bind(transform);
   animation: action-pointer-pulse 0.5s ease-out forwards;
