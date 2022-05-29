@@ -70,7 +70,10 @@ export default {
 }
 
 #monster-hp-bar {
+  position: absolute;
+  width: 100%;
   height: 10px;
+  top: 0;
   background-color: gainsboro;
 }
 

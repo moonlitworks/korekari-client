@@ -25,6 +25,7 @@ export default {
     ActionArc,
   },
   props: {
+    id: String,
     color: {
       r: Number,
       g: Number,

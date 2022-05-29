@@ -57,9 +57,9 @@ export default {
     },
   },
   created() {
-    this.addTarget(120, 255, 0, 0, 50, 30);
-    this.addTarget(240, 255, 0, 0, 50, 6);
-    this.addTarget(0, 255, 0, 0, 20, 6);
+    this.addTarget(270, 255, 0, 0, 30, 6);
+    this.addTarget(30, 255, 0, 0, 30, 6);
+    this.addTarget(150, 255, 0, 0, 30, 6);
   },
   methods: {
     addTarget(angle, r, g, b, space, critSpace) {
@@ -80,13 +80,18 @@ export default {
         const hit = target.checkHit(angle);
         if (hit === "CRITICAL") {
           this.$emit("monsterHit", 10, true);
+          return true;
         } else if (hit === "HIT") {
           this.$emit("monsterHit", 1, false);
+          return true;
         }
       };
     },
     checkHit(angle) {
-      this.$refs["action-target"].forEach(this.handleHit(angle).bind(this));
+      const hitMonster = this.$refs["action-target"]
+        .map(this.handleHit(angle).bind(this))
+        .some((hit) => hit === true);
+      if (!hitMonster) this.$emit("playerHit", 5);
     },
     addShadow(angle) {
       this.shadows.push({
