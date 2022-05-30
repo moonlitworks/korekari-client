@@ -8,25 +8,48 @@
   <div id="monster-hp-bar">
     <div id="monster-hp"></div>
   </div>
+
+  <div id="monster-info">
+    <div>{{ monster.name }} (Lv {{ monster.level }})</div>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "Monster",
   props: {
-    maxHp: Number,
+    monster: {
+      name: String,
+      level: Number,
+      maxHp: Number,
+      element: String,
+      hitConfig: {
+        normalWidth: Number,
+        normalDamage: Number,
+        criticalWidth: Number,
+        criticalDamage: Number,
+        normalAttack: Number,
+      },
+      skills: [
+        {
+          name: String,
+          element: String,
+          damage: Number,
+          dodgeWidth: Number,
+        },
+      ],
+    },
   },
   data: () => ({
     hp: 0,
     flinch: false,
     critical: false,
   }),
-  created() {
-    this.hp = this.maxHp;
+  mounted() {
+    this.hp = this.monster.maxHp;
   },
   computed: {
     hpPercentage() {
-      const pct = (this.hp / this.maxHp) * 100;
+      const pct = (this.hp / this.monster.maxHp) * 100;
       return `${pct}%`;
     },
   },
@@ -42,7 +65,7 @@ export default {
         this.critical = true;
       }
       if (this.hp <= 0) {
-        this.hp = this.maxHp;
+        this.hp = this.monster.maxHp;
       }
     },
   },
@@ -75,6 +98,12 @@ export default {
   height: 10px;
   top: 0;
   background-color: gainsboro;
+}
+
+#monster-info {
+  position: absolute;
+  top: 12px;
+  left: 10px;
 }
 
 #monster-hp {

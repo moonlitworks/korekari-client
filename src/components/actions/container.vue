@@ -68,12 +68,35 @@ export default {
       );
     },
   },
-  created() {
-    this.addTarget(270, 255, 0, 0, 30, 6);
-    this.addTarget(30, 255, 0, 0, 30, 6);
-    this.addTarget(150, 255, 0, 0, 30, 6);
-  },
   methods: {
+    setMonsterAttackTargets(monster) {
+      if (!monster || !monster.hitConfig) return;
+
+      this.addTarget(
+        270,
+        255,
+        0,
+        0,
+        monster.hitConfig.normalWidth,
+        monster.hitConfig.criticalWidth
+      );
+      this.addTarget(
+        30,
+        255,
+        0,
+        0,
+        monster.hitConfig.normalWidth,
+        monster.hitConfig.criticalWidth
+      );
+      this.addTarget(
+        150,
+        255,
+        0,
+        0,
+        monster.hitConfig.normalWidth,
+        monster.hitConfig.criticalWidth
+      );
+    },
     addTarget(angle, r, g, b, space, critSpace) {
       this.targets.push({
         id: uuid.v4(),
