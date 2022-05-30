@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/moonlitworks/korekari-client/compare/v0.1.2...v0.1.3) (2022-05-30)
+
+
+### Features
+
+* **core:** add player feedback and use monster hitconfig ([d021ea0](https://github.com/moonlitworks/korekari-client/commit/d021ea0167ba9ea58733ebc9a1f50eb9ec7028d1))
+
 ### [0.1.2](https://github.com/moonlitworks/korekari-client/compare/v0.1.1...v0.1.2) (2022-05-29)
 
 
