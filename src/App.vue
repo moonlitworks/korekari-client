@@ -1,14 +1,13 @@
 <template>
-  <KoreKari />
+  <Game />
 </template>
 
 <script>
-import KoreKari from "./components/korekari.vue";
-
+import Game from "./components/game.vue";
 export default {
   name: "App",
   components: {
-    KoreKari,
+    Game,
   },
 };
 </script>

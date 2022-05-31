@@ -1,44 +1,48 @@
 <template>
   <path
-    :stroke="color"
+    :stroke="arc.color"
+    :stroke-opacity="arc.opacity"
     :stroke-width="strokeWidth"
     stroke-linecap="round"
     fill="none"
-    :d="calculatePathD(startAngle, endAngle)"
+    :d="calculatePathD(arc.start, arc.end)"
   />
 </template>
 
 <script>
 export default {
-  name: "ActionArc",
+  name: "Arc",
   props: {
-    radius: Number,
-    thickness: Number,
-    color: String,
-    startAngle: Number,
-    endAngle: Number,
+    arc: {
+      radius: Number,
+      thickness: Number,
+      color: String,
+      opacity: Number,
+      start: Number,
+      end: Number,
+    },
   },
   computed: {
     strokeWidth() {
-      return `${this.thickness}px`;
+      return `${this.arc.thickness}px`;
     },
     arcRadius() {
-      return this.radius - this.thickness;
+      return this.arc.radius - this.arc.thickness;
     },
   },
   methods: {
     calculatePathD(startAngle, endAngle) {
       const startX =
-        this.radius +
+        this.arc.radius +
         this.calculateAngleX(this.toRadians(startAngle), this.arcRadius);
       const startY =
-        this.radius +
+        this.arc.radius +
         this.calculateAngleY(this.toRadians(startAngle), this.arcRadius);
       const endX =
-        this.radius +
+        this.arc.radius +
         this.calculateAngleX(this.toRadians(endAngle), this.arcRadius);
       const endY =
-        this.radius +
+        this.arc.radius +
         this.calculateAngleY(this.toRadians(endAngle), this.arcRadius);
       const largeArcFlag =
         Math.abs((endAngle - startAngle) % 360) <= 180 ? "0" : "1";
@@ -51,7 +55,7 @@ export default {
       return radius * Math.sin(angle);
     },
     toRadians(deg) {
-      return deg * (Math.PI / 180);
+      return (deg + 270) * (Math.PI / 180);
     },
   },
 };

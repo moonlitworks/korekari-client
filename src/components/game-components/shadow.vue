@@ -1,19 +1,33 @@
 <template>
-  <circle class="action-pointer-shadow" />
+  <circle class="pointer-shadow" />
 </template>
 
 <script>
 export default {
-  name: "ActionPointerShadow",
+  name: "Shadow",
   props: {
-    id: String,
-    radius: Number,
-    thickness: Number,
-    angle: Number,
+    shadow: {
+      id: String,
+      radius: Number,
+      thickness: Number,
+      angle: Number,
+    },
   },
   computed: {
+    id() {
+      return this.shadow.id;
+    },
+    angle() {
+      return this.shadow.angle;
+    },
+    radius() {
+      return this.shadow.radius;
+    },
+    thickness() {
+      return this.shadow.thickness;
+    },
     transform() {
-      return `rotate(${this.normalizedAngle(this.angle)}deg)`;
+      return `rotate(${(this.angle + 360) % 360}deg)`;
     },
     pointerRadius() {
       return `${this.thickness / 2}px`;
@@ -27,28 +41,24 @@ export default {
       this.$emit("remove", this.id);
     }, 1000);
   },
-  methods: {
-    normalizedAngle(angle) {
-      return (angle + 90) % 360;
-    },
-  },
 };
 </script>
 
 <style scoped>
-.action-pointer-shadow {
+.pointer-shadow {
   cx: v-bind(radius);
   cy: v-bind(thickness);
   r: v-bind(pointerRadius);
-  fill: gray;
+  fill: #474747;
   transform-origin: 50% 50%;
   transform: v-bind(transform);
-  animation: action-pointer-pulse 0.5s ease-out forwards;
+  animation: pointer-pulse 0.5s ease-out forwards;
 }
 
-@keyframes action-pointer-pulse {
+@keyframes pointer-pulse {
   0% {
     r: v-bind(pointerRadius);
+    opacity: 1;
   }
   100% {
     r: v-bind(pointerRadiusEnd);
