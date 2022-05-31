@@ -1,15 +1,15 @@
 <template>
   <div id="game-screen">
+    <Player ref="player" :player="playerObject" />
+    <Monster ref="monster" :monster="monsterObject" />
     <Ring
       ref="ring"
-      :thickness="10"
+      :thickness="20"
       :speed="'3s'"
       :ringColor="'black'"
       :ringOpacity="0.1"
       :pointerColor="'red'"
     />
-    <Player ref="player" :player="playerObject" />
-    <Monster ref="monster" :monster="monsterObject" />
     <Interaction @interaction="interaction" />
     <Server />
   </div>
