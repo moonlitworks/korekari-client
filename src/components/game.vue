@@ -11,6 +11,7 @@
     <Player ref="player" :player="playerObject" />
     <Monster ref="monster" :monster="monsterObject" />
     <Interaction @interaction="interaction" />
+    <Server />
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import Ring from "./game-components/ring.vue";
 import Player from "./game-components/player.vue";
 import Monster from "./game-components/monster.vue";
 import Interaction from "./game-components/interaction.vue";
+import Server from "./game-components/server.vue";
 
 export default {
   name: "KoreKari",
@@ -27,6 +29,7 @@ export default {
     Player,
     Monster,
     Interaction,
+    Server,
   },
   data: () => ({
     playerObject: {
