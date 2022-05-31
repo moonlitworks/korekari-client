@@ -38,6 +38,8 @@ export default {
       maxHp: 100,
       items: [
         {
+          id: "STICK",
+          type: "WEAPON",
           name: "Stick",
           element: "Neutral",
           damage: 1,
@@ -58,6 +60,7 @@ export default {
       },
       skills: [
         {
+          id: "SLIME",
           name: "Slime",
           element: "NEUTRAL",
           damage: 10,

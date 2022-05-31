@@ -19,6 +19,8 @@ export default {
       maxHp: Number,
       items: [
         {
+          id: String,
+          type: String,
           name: String,
           element: String,
           damage: Number,
