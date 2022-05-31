@@ -1,5 +1,5 @@
 <template>
-  <g>
+  <g :class="{ fade: !active }">
     <Arc :arc="defaultArc" />
     <Arc v-if="hasBonusArc" :arc="bonusArc" />
   </g>
@@ -24,7 +24,13 @@ export default {
       bonusEnd: Number,
     },
   },
+  data: () => ({
+    active: true,
+  }),
   computed: {
+    id() {
+      return this.target.id;
+    },
     hasBonusArc() {
       return this.target.bonusStart && this.target.bonusEnd;
     },
@@ -50,7 +56,15 @@ export default {
     },
   },
   methods: {
+    fade() {
+      this.active = false;
+      setTimeout(() => {
+        this.$emit("remove", this.target.id);
+      }, 500);
+    },
     hitType(angle) {
+      if (!this.active) return undefined;
+
       if (
         this.hasBonusArc &&
         this.detectHit(angle, this.target.bonusStart, this.target.bonusEnd)
@@ -77,4 +91,16 @@ export default {
 </script>
 
 <style scoped>
+g.fade {
+  animation: fade 0.5s ease forwards;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 </style>

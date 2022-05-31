@@ -7,6 +7,7 @@
         v-for="target in targetList"
         :key="target.id"
         :target="target"
+        @remove="removeTarget"
       />
     </g>
     <g id="shadows">
@@ -80,6 +81,9 @@ export default {
     },
     removeTarget(id) {
       this.targetList = this.targetList.filter((x) => x.id !== id);
+    },
+    fadeTarget(id) {
+      this.targets.find((x) => x.id === id)?.fade();
     },
     addShadow(angle) {
       this.shadowList.push({

@@ -4,7 +4,7 @@
     <Monster ref="monster" :monster="monsterObject" />
     <Ring
       ref="ring"
-      :thickness="20"
+      :thickness="10"
       :speed="'3s'"
       :ringColor="'black'"
       :ringOpacity="0.1"
@@ -97,6 +97,7 @@ export default {
           } else {
             this.monster.receiveDamage(1);
           }
+          this.ring.fadeTarget(hit.id);
         });
       }
     },
