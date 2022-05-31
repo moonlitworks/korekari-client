@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/moonlitworks/korekari-client/compare/v0.1.4...v0.2.0) (2022-05-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump minor after revamp
+
+* feat!(server): prepare component for server connection ([ca81dcf](https://github.com/moonlitworks/korekari-client/commit/ca81dcf6e983fb79ac41b687f7beb1e62dfc4ca4))
+
 ### [0.1.4](https://github.com/moonlitworks/korekari-client/compare/v0.1.3...v0.1.4) (2022-05-31)
 
 ### [0.1.3](https://github.com/moonlitworks/korekari-client/compare/v0.1.2...v0.1.3) (2022-05-30)
