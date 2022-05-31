@@ -15,6 +15,7 @@ export default {
   props: {
     target: {
       id: String,
+      type: String,
       radius: Number,
       thickness: Number,
       color: String,
@@ -22,6 +23,8 @@ export default {
       end: Number,
       bonusStart: Number,
       bonusEnd: Number,
+      lifetime: Number,
+      hits: Number,
     },
   },
   data: () => ({
@@ -54,6 +57,13 @@ export default {
         opacity: 0.7,
       };
     },
+  },
+  mounted() {
+    if (this.target.lifetime) {
+      setTimeout(() => {
+        this.fade();
+      }, this.target.lifetime);
+    }
   },
   methods: {
     fade() {

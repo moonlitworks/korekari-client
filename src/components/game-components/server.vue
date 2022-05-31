@@ -10,6 +10,25 @@ export default {
   data: () => ({
     connected: false,
   }),
+  mounted() {
+    // socket.on("data", () => receive(data))
+
+    // create mock server events
+    setInterval(() => {
+      this.addTarget();
+    }, 1000);
+  },
+  methods: {
+    addTarget() {
+      // this.$emit("addTarget", Math.floor(Math.random() * (360 + 1)));
+    },
+    send(data) {
+      console.log("sent to server", data);
+    },
+    receive(data) {
+      console.log("received from server", data);
+    },
+  },
 };
 </script>
 

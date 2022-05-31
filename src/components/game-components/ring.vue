@@ -67,12 +67,14 @@ export default {
     },
   },
   methods: {
-    addTarget(angle, color, size, bonusSize) {
+    addTarget(type, angle, color, size, bonusSize, lifetime) {
       this.targetList.push({
         id: uuid.v4(),
         radius: this.radius,
         thickness: this.thickness,
+        type,
         color,
+        lifetime,
         start: angle - size,
         end: angle + size,
         bonusStart: bonusSize ? angle - bonusSize : undefined,

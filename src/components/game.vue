@@ -11,7 +11,7 @@
       :pointerColor="'red'"
     />
     <Interaction @interaction="interaction" />
-    <Server />
+    <Server @addTarget="addTarget" />
   </div>
 </template>
 
@@ -81,9 +81,9 @@ export default {
     },
   },
   mounted() {
-    this.ring.addTarget(0, "red", 30, 20);
-    this.ring.addTarget(120, "red", 30, 20);
-    this.ring.addTarget(240, "red", 30, 20);
+    this.ring.addTarget("ATTACK", 0, "red", 30, 20, 3000);
+    this.ring.addTarget("ATTACK", 120, "red", 30, 20);
+    this.ring.addTarget("ATTACK", 240, "red", 30, 20);
   },
   methods: {
     interaction() {
@@ -100,6 +100,9 @@ export default {
           this.ring.fadeTarget(hit.id);
         });
       }
+    },
+    addTarget(angle) {
+      this.ring.addTarget("ATTACK", angle, "red", 30, 20);
     },
   },
 };
