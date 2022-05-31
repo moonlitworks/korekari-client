@@ -1,12 +1,12 @@
 <template>
   <svg id="ring-box" ref="ring-box">
     <circle id="ring" />
-    <g id="arcs">
-      <ArcCombo
-        ref="arc"
-        v-for="arc in arcList"
-        :key="arc.id"
-        :arcCombo="arc"
+    <g id="targets">
+      <Target
+        ref="target"
+        v-for="target in targetList"
+        :key="target.id"
+        :target="target"
       />
     </g>
     <g id="shadows">
@@ -23,12 +23,12 @@
 
 <script>
 import { uuid } from "vue-uuid";
-import ArcCombo from "./arc-combo.vue";
+import Target from "./target.vue";
 import Shadow from "./shadow.vue";
 export default {
   name: "Ring",
   components: {
-    ArcCombo,
+    Target,
     Shadow,
   },
   props: {
@@ -39,12 +39,12 @@ export default {
     pointerColor: String, // unused
   },
   data: () => ({
-    arcList: [],
+    targetList: [],
     shadowList: [],
   }),
   computed: {
-    arcs() {
-      return this.$refs["arc"] ?? [];
+    targets() {
+      return this.$refs["target"] ?? [];
     },
     pointer() {
       return this.$refs["pointer"];
@@ -66,8 +66,8 @@ export default {
     },
   },
   methods: {
-    addArc(angle, color, size, bonusSize) {
-      this.arcList.push({
+    addTarget(angle, color, size, bonusSize) {
+      this.targetList.push({
         id: uuid.v4(),
         radius: this.radius,
         thickness: this.thickness,
@@ -78,8 +78,8 @@ export default {
         bonusEnd: bonusSize ? angle + bonusSize : undefined,
       });
     },
-    removeArc(id) {
-      this.arcList = this.arcList.filter((x) => x.id !== id);
+    removeTarget(id) {
+      this.targetList = this.targetList.filter((x) => x.id !== id);
     },
     addShadow(angle) {
       this.shadowList.push({
@@ -95,22 +95,16 @@ export default {
     hit() {
       const currentAngle = this.calculateAngleV1();
       this.addShadow(currentAngle);
-      const hits = this.arcs
-        .filter((arc) => arc.hitType(currentAngle))
-        .map((arc) => ({
-          ...arc.toObject(),
-          hitType: arc.hitType(currentAngle),
+      const hits = this.targets
+        .filter((target) => target.hitType(currentAngle))
+        .map((target) => ({
+          ...target.toObject(),
+          hitType: target.hitType(currentAngle),
         }));
       return {
         angle: currentAngle,
         hits,
       };
-      // .filter((arc) => arc.hitType(currentAngle) !== undefined)
-      // .map((arc) => ({
-      //   ...arc.toObject(),
-      //   angle: currentAngle,
-      //   hitType: arc.hitType(currentAngle),
-      // }));
     },
     calculateAngleV1() {
       const style = window.getComputedStyle(this.pointer, null);

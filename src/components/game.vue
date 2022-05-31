@@ -78,9 +78,9 @@ export default {
     },
   },
   mounted() {
-    this.ring.addArc(0, "red", 30, 20);
-    this.ring.addArc(120, "red", 30, 20);
-    this.ring.addArc(240, "red", 30, 20);
+    this.ring.addTarget(0, "red", 30, 20);
+    this.ring.addTarget(120, "red", 30, 20);
+    this.ring.addTarget(240, "red", 30, 20);
   },
   methods: {
     interaction() {

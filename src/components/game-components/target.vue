@@ -8,12 +8,12 @@
 <script>
 import Arc from "./arc.vue";
 export default {
-  name: "ArcCombo",
+  name: "Target",
   components: {
     Arc,
   },
   props: {
-    arcCombo: {
+    target: {
       id: String,
       radius: Number,
       thickness: Number,
@@ -26,25 +26,25 @@ export default {
   },
   computed: {
     hasBonusArc() {
-      return this.arcCombo.bonusStart && this.arcCombo.bonusEnd;
+      return this.target.bonusStart && this.target.bonusEnd;
     },
     defaultArc() {
       return {
-        radius: this.arcCombo.radius,
-        thickness: this.arcCombo.thickness,
-        color: this.arcCombo.color,
-        start: this.arcCombo.start,
-        end: this.arcCombo.end,
+        radius: this.target.radius,
+        thickness: this.target.thickness,
+        color: this.target.color,
+        start: this.target.start,
+        end: this.target.end,
         opacity: this.hasBonusArc ? 0.3 : 0.7,
       };
     },
     bonusArc() {
       return {
-        radius: this.arcCombo.radius,
-        thickness: this.arcCombo.thickness,
-        color: this.arcCombo.color,
-        start: this.arcCombo.bonusStart,
-        end: this.arcCombo.bonusEnd,
+        radius: this.target.radius,
+        thickness: this.target.thickness,
+        color: this.target.color,
+        start: this.target.bonusStart,
+        end: this.target.bonusEnd,
         opacity: 0.7,
       };
     },
@@ -53,12 +53,10 @@ export default {
     hitType(angle) {
       if (
         this.hasBonusArc &&
-        this.detectHit(angle, this.arcCombo.bonusStart, this.arcCombo.bonusEnd)
+        this.detectHit(angle, this.target.bonusStart, this.target.bonusEnd)
       ) {
         return "BONUS";
-      } else if (
-        this.detectHit(angle, this.arcCombo.start, this.arcCombo.end)
-      ) {
+      } else if (this.detectHit(angle, this.target.start, this.target.end)) {
         return "HIT";
       }
 
@@ -72,7 +70,7 @@ export default {
       }
     },
     toObject() {
-      return Object.assign({}, this.arcCombo);
+      return Object.assign({}, this.target);
     },
   },
 };
