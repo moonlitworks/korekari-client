@@ -1,9 +1,38 @@
 <template>
-  <img
-    id="monster-image"
+  <Sprite
+    id="sprite"
     :class="{ flinch: flinch, critical: critical }"
-    src="https://i.pinimg.com/originals/39/c5/a8/39c5a8ef2f587d4a7f742ba16371ad48.gif"
+    :image="require('@/assets/sprites/worm/idle.png')"
+    :width="900"
+    :height="900"
+    :cuts="9"
+    :duration="'1.0s'"
+    :loop="'infinite'"
   />
+
+  <!-- <Sprite
+    id="sprite"
+    :image="require('@/assets/sprites/worm/attack.png')"
+    :width="900"
+    :height="900"
+    :cuts="15"
+    :duration="'1.0s'"
+    :loop="'1'"
+    :fillMode="'forwards'"
+    :direction="'normal'"
+  /> -->
+
+  <!-- <Sprite
+    id="sprite"
+    :image="require('@/assets/sprites/worm/death.png')"
+    :width="900"
+    :height="900"
+    :cuts="7"
+    :duration="'1.0s'"
+    :loop="'1'"
+    :fillMode="'forwards'"
+    :direction="'normal'"
+  /> -->
 
   <div id="monster-hp-bar">
     <div id="monster-hp"></div>
@@ -15,9 +44,13 @@
 </template>
 
 <script>
+import Sprite from "./sprite.vue";
 export default {
   name: "Monster",
-  emits: ["dead"],
+  components: {
+    Sprite,
+  },
+  emits: ["dying", "dead"],
   props: {
     monster: {
       name: String,
@@ -84,22 +117,18 @@ export default {
 </script>
 
 <style scoped>
-#monster-image {
+#sprite {
   position: absolute;
-  max-width: 100%;
-  top: 50%;
   left: 50%;
+  top: 50%;
   transform: translateX(-50%) translateY(-50%);
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
 }
 
-#monster-image.flinch {
+#sprite.flinch {
   filter: grayscale(100%);
 }
 
-#monster-image.critical {
+#sprite.critical {
   animation: image-shake 100ms linear infinite;
 }
 

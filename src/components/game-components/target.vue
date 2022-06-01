@@ -69,7 +69,7 @@ export default {
         color: this.color,
         start: this.start,
         end: this.end,
-        opacity: this.hasBonusArc ? 0.3 : 0.7,
+        opacity: this.hasBonusArc ? 0.4 : 0.9,
       };
     },
     bonusArc() {
@@ -79,7 +79,7 @@ export default {
         color: this.color,
         start: this.bonusStart,
         end: this.bonusEnd,
-        opacity: 0.7,
+        opacity: 0.9,
       };
     },
   },

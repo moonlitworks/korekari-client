@@ -1,5 +1,6 @@
 <template>
   <svg id="ring-box" ref="ring-box">
+    <circle id="ring-backdrop" />
     <circle id="ring" ref="ring" />
     <g id="targets">
       <Target
@@ -88,6 +89,9 @@ export default {
     },
     thicknessPx() {
       return `${this.thickness}px`;
+    },
+    backdropThicknessPx() {
+      return `${this.thickness + this.thickness / 2}px`;
     },
     halfThicknessPx() {
       return `${this.thickness / 2}px`;
@@ -184,12 +188,22 @@ export default {
   -webkit-user-select: none;
 }
 
-#ring {
+#ring-backdrop {
   cx: 50%;
   cy: 50%;
   r: v-bind(ringRadius);
   stroke: black;
-  stroke-opacity: 0.1;
+  stroke-opacity: 0.4;
+  stroke-width: v-bind(backdropThicknessPx);
+  fill: none;
+}
+
+#ring {
+  cx: 50%;
+  cy: 50%;
+  r: v-bind(ringRadius);
+  stroke: white;
+  stroke-opacity: 1;
   stroke-width: v-bind(thicknessPx);
   fill: none;
 }
