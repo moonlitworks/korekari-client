@@ -65,7 +65,8 @@ export default {
       return this.targets.filter((x) => x.active).map((x) => x.toObject());
     },
     targets() {
-      return this.$refs["target-element"] ?? [];
+      if (this.targetList.length <= 0) return [];
+      return this.$refs["target-element"];
     },
     shadows() {
       return this.$refs["shadow-element"] ?? [];
