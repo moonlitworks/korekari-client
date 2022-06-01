@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/moonlitworks/korekari-client/compare/v0.2.3...v0.2.4) (2022-06-01)
+
+
+### Features
+
+* **core:** add icons ([8821d32](https://github.com/moonlitworks/korekari-client/commit/8821d325a8e9d0ce6dd3b2510e2b06b871fa7a17))
+
 ### [0.2.3](https://github.com/moonlitworks/korekari-client/compare/v0.2.2...v0.2.3) (2022-06-01)
 
 
