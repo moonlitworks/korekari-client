@@ -1,6 +1,6 @@
 <template>
   <svg id="ring-box" ref="ring-box">
-    <circle id="ring" />
+    <circle id="ring" ref="ring" />
     <g id="targets">
       <Target
         ref="target-element"
@@ -11,6 +11,7 @@
         :thickness="thickness"
         :type="target.type"
         :color="target.color"
+        :angle="target.angle"
         :start="target.start"
         :end="target.end"
         :bonusStart="target.bonusStart"
@@ -75,6 +76,9 @@ export default {
     ringBox() {
       return this.$refs["ring-box"];
     },
+    ring() {
+      return this.$refs["ring"];
+    },
     radius() {
       return this.ringBox.clientWidth / 2;
     },
@@ -96,6 +100,7 @@ export default {
         color,
         lifetime,
         hits,
+        angle,
         start: angle - size,
         end: angle + size,
         bonusStart: bonusSize ? angle - bonusSize : undefined,
@@ -163,6 +168,7 @@ export default {
 }
 
 #ring-box {
+  overflow: visible;
   position: absolute;
   display: inline-block;
   top: 50%;

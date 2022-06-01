@@ -25,8 +25,23 @@ export default {
 
       const angle = Math.floor(Math.random() * 361);
       const hits = 1;
-      const type = Math.random() > 0.95 ? "SKILL" : "ATTACK";
-      const color = type === "SKILL" ? "blue" : "red";
+      const type =
+        Math.random() > 0.95
+          ? "SKILL"
+          : Math.random() > 0.8
+          ? "HEAL"
+          : "ATTACK";
+      const color = (() => {
+        switch (type) {
+          case "HEAL":
+            return "orange";
+          case "SKILL":
+            return "blue";
+          case "ATTACK":
+          default:
+            return "red";
+        }
+      })();
       this.$emit("addTarget", { angle, hits, type, color });
     },
     send(data) {

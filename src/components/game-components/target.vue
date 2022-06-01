@@ -2,11 +2,14 @@
   <g :class="{ fade: fading }">
     <Arc :arc="defaultArc" :frailty="frailty" />
     <Arc v-if="hasBonusArc" :arc="bonusArc" :frailty="frailty" />
+    <component id="icon" :is="icon" :angle="angle"></component>
   </g>
 </template>
 
 <script>
 import Arc from "./arc.vue";
+import Sword from "../icons/sword.vue";
+import Heart from "../icons/heart.vue";
 export default {
   name: "Target",
   components: {
@@ -15,6 +18,7 @@ export default {
   props: {
     id: String,
     type: String,
+    angle: Number,
     radius: Number,
     thickness: Number,
     color: String,
@@ -31,6 +35,16 @@ export default {
     hitsLeft: undefined,
   }),
   computed: {
+    icon() {
+      switch (this.type) {
+        case "HEAL":
+          return Heart;
+        case "ATTACK":
+        case "SKILL":
+        default:
+          return Sword;
+      }
+    },
     frailty() {
       if (this.hits === 1 || this.hits === undefined) {
         return "STURDY";
@@ -43,7 +57,7 @@ export default {
       }
     },
     hasBonusArc() {
-      return this.bonusStart && this.bonusEnd;
+      return this.bonusStart !== undefined && this.bonusEnd !== undefined;
     },
     canBeHit() {
       return this.active && (this.hitsLeft === undefined || this.hitsLeft > 0);

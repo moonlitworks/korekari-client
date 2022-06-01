@@ -50,6 +50,10 @@ export default {
       this.hurt = true;
       if (this.hp <= 0) this.hp = this.player.maxHp;
     },
+    heal(value) {
+      this.hp += value;
+      if (this.hp > this.player.maxHp) this.hp = this.player.maxHp;
+    },
   },
 };
 </script>

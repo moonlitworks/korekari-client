@@ -80,20 +80,30 @@ export default {
       if (hitInfo.hits.length <= 0) {
         // dont damage player if no target is in ring
         if (this.ring.activeTargets.length > 0) {
-          this.player?.receiveDamage(10);
+          this.player?.receiveDamage(3);
           this.combo.resetCombo();
         }
       } else {
         hitInfo.hits.forEach((hit) => {
-          if (hit.hitType === "BONUS") {
-            const damage = hit.type === "SKILL" ? 100 : 10;
-            this.monster?.receiveDamage(damage, true);
-          } else {
-            const damage = hit.type === "SKILL" ? 10 : 1;
-            this.monster?.receiveDamage(damage);
+          if (hit.type === "HEAL") {
+            const healValue = hit.hitType === "BONUS" ? 50 : 10;
+            this.player?.heal(healValue);
+          } else if (hit.type === "SKILL") {
+            if (hit.hitType === "BONUS") {
+              this.monster?.receiveDamage(50, true);
+            } else {
+              this.monster?.receiveDamage(10, true);
+            }
+          } else if (hit.type === "ATTACK") {
+            if (hit.hitType === "BONUS") {
+              this.monster?.receiveDamage(10, true);
+            } else {
+              this.monster?.receiveDamage(1);
+            }
           }
-          this.ring.hitTarget(hit.id);
+
           this.combo?.addCombo();
+          this.ring.hitTarget(hit.id);
         });
       }
     },
