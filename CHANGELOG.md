@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/moonlitworks/korekari-client/compare/v0.2.2...v0.2.3) (2022-06-01)
+
+
+### Features
+
+* **core:** working loop with combo and dynamic targets ([d1f78bc](https://github.com/moonlitworks/korekari-client/commit/d1f78bc5b90bca0aa54b332ea131d8e6a88ffedb))
+* **server:** mock server events ([d818c1b](https://github.com/moonlitworks/korekari-client/commit/d818c1b6da06d5f04d0e9652ae70ef7648db805a))
+* **target:** add mechanics to fade out target ([ffb98d1](https://github.com/moonlitworks/korekari-client/commit/ffb98d1637fc8631e624e9b500cb66beab72c815))
+
 ### [0.2.2](https://github.com/moonlitworks/korekari-client/compare/v0.2.1...v0.2.2) (2022-05-31)
 
 ### [0.2.1](https://github.com/moonlitworks/korekari-client/compare/v0.2.0...v0.2.1) (2022-05-31)
