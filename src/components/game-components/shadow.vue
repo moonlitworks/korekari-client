@@ -6,26 +6,12 @@
 export default {
   name: "Shadow",
   props: {
-    shadow: {
-      id: String,
-      radius: Number,
-      thickness: Number,
-      angle: Number,
-    },
+    id: String,
+    radius: Number,
+    thickness: Number,
+    angle: Number,
   },
   computed: {
-    id() {
-      return this.shadow.id;
-    },
-    angle() {
-      return this.shadow.angle;
-    },
-    radius() {
-      return this.shadow.radius;
-    },
-    thickness() {
-      return this.shadow.thickness;
-    },
     transform() {
       return `rotate(${(this.angle + 360) % 360}deg)`;
     },

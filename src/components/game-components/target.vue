@@ -1,7 +1,7 @@
 <template>
-  <g :class="{ fade: !active }">
-    <Arc :arc="defaultArc" />
-    <Arc v-if="hasBonusArc" :arc="bonusArc" />
+  <g :class="{ fade: fading }">
+    <Arc :arc="defaultArc" :frailty="frailty" />
+    <Arc v-if="hasBonusArc" :arc="bonusArc" :frailty="frailty" />
   </g>
 </template>
 
@@ -13,74 +13,88 @@ export default {
     Arc,
   },
   props: {
-    target: {
-      id: String,
-      type: String,
-      radius: Number,
-      thickness: Number,
-      color: String,
-      start: Number,
-      end: Number,
-      bonusStart: Number,
-      bonusEnd: Number,
-      lifetime: Number,
-      hits: Number,
-    },
+    id: String,
+    type: String,
+    radius: Number,
+    thickness: Number,
+    color: String,
+    start: Number,
+    end: Number,
+    bonusStart: Number,
+    bonusEnd: Number,
+    lifetime: Number,
+    hits: Number,
   },
   data: () => ({
     active: true,
+    fading: false,
+    hitsLeft: undefined,
   }),
   computed: {
-    id() {
-      return this.target.id;
+    frailty() {
+      if (this.hits === 1 || this.hits === undefined) {
+        return "STURDY";
+      } else if (this.hitsLeft >= 3) {
+        return "STURDY";
+      } else if (this.hitsLeft === 2) {
+        return "WORN";
+      } else {
+        return "BRITTLE";
+      }
     },
     hasBonusArc() {
-      return this.target.bonusStart && this.target.bonusEnd;
+      return this.bonusStart && this.bonusEnd;
+    },
+    canBeHit() {
+      return this.active && (this.hitsLeft === undefined || this.hitsLeft > 0);
     },
     defaultArc() {
       return {
-        radius: this.target.radius,
-        thickness: this.target.thickness,
-        color: this.target.color,
-        start: this.target.start,
-        end: this.target.end,
+        radius: this.radius,
+        thickness: this.thickness,
+        color: this.color,
+        start: this.start,
+        end: this.end,
         opacity: this.hasBonusArc ? 0.3 : 0.7,
       };
     },
     bonusArc() {
       return {
-        radius: this.target.radius,
-        thickness: this.target.thickness,
-        color: this.target.color,
-        start: this.target.bonusStart,
-        end: this.target.bonusEnd,
+        radius: this.radius,
+        thickness: this.thickness,
+        color: this.color,
+        start: this.bonusStart,
+        end: this.bonusEnd,
         opacity: 0.7,
       };
     },
   },
   mounted() {
-    if (this.target.lifetime) {
+    if (this.lifetime) {
       setTimeout(() => {
         this.fade();
-      }, this.target.lifetime);
+      }, this.lifetime);
     }
+    this.hitsLeft = this.hits;
   },
   methods: {
-    fade() {
-      this.active = false;
+    fade(inactivate = false) {
+      if (inactivate) this.active = false;
+      this.fading = true;
       setTimeout(() => {
-        this.$emit("remove", this.target.id);
+        this.active = false;
+        this.$emit("remove", this.id);
       }, 500);
     },
     hitType(angle) {
-      if (!this.active) return undefined;
+      if (!this.canBeHit) return undefined;
 
       if (
         this.hasBonusArc &&
-        this.detectHit(angle, this.target.bonusStart, this.target.bonusEnd)
+        this.detectHit(angle, this.bonusStart, this.bonusEnd)
       ) {
         return "BONUS";
-      } else if (this.detectHit(angle, this.target.start, this.target.end)) {
+      } else if (this.detectHit(angle, this.start, this.end)) {
         return "HIT";
       }
 
@@ -93,8 +107,28 @@ export default {
         return angle >= start && angle <= end;
       }
     },
+    handleHit() {
+      if (this.hitsLeft > 0) {
+        this.hitsLeft -= 1;
+        if (this.hitsLeft <= 0) {
+          this.fade(true);
+        }
+      }
+    },
     toObject() {
-      return Object.assign({}, this.target);
+      return {
+        id: this.id,
+        type: this.type,
+        radius: this.radius,
+        thickness: this.thickness,
+        color: this.color,
+        start: this.start,
+        end: this.end,
+        bonusStart: this.bonusStart,
+        bonusEnd: this.bonusEnd,
+        lifetime: this.lifetime,
+        hits: this.hits,
+      };
     },
   },
 };

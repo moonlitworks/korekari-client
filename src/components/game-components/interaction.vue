@@ -3,7 +3,7 @@
     id="interaction-screen"
     ref="interaction-screen"
     tabindex="-1"
-    @mousedown.prevent="interaction"
+    @mousedown.left.prevent="interaction"
     @keydown.space.prevent="interaction"
   ></div>
 </template>

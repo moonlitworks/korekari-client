@@ -5,6 +5,7 @@
     :stroke-width="strokeWidth"
     stroke-linecap="round"
     fill="none"
+    :filter="filter"
     :d="calculatePathD(arc.start, arc.end)"
   />
 </template>
@@ -13,6 +14,7 @@
 export default {
   name: "Arc",
   props: {
+    frailty: String,
     arc: {
       radius: Number,
       thickness: Number,
@@ -23,6 +25,17 @@ export default {
     },
   },
   computed: {
+    filter() {
+      switch (this.frailty) {
+        case "BRITTLE":
+          return `invert(40%)`;
+        case "WORN":
+          return `invert(20%)`;
+        case "STURDY":
+        default:
+          return `invert(0%)`;
+      }
+    },
     strokeWidth() {
       return `${this.arc.thickness}px`;
     },

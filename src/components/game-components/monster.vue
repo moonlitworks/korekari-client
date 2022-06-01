@@ -16,6 +16,8 @@
 
 <script>
 export default {
+  name: "Monster",
+  emits: ["dead"],
   props: {
     monster: {
       name: String,
@@ -41,14 +43,21 @@ export default {
     },
   },
   data: () => ({
+    status: "ACTIVE", // "ENTERING", "LEAVING", "DYING"
     hp: 0,
     flinch: false,
     critical: false,
   }),
   mounted() {
     this.hp = this.monster.maxHp;
+    this.status = "ACTIVE";
+    this.flinch = false;
+    this.critical = false;
   },
   computed: {
+    isActive() {
+      return this.status === "ACTIVE";
+    },
     hpPercentage() {
       const pct = (this.hp / this.monster.maxHp) * 100;
       return `${pct}%`;
@@ -66,7 +75,8 @@ export default {
         this.critical = true;
       }
       if (this.hp <= 0) {
-        this.hp = this.monster.maxHp;
+        this.status === "DYING";
+        this.$emit("dead");
       }
     },
   },

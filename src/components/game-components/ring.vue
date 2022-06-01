@@ -3,18 +3,33 @@
     <circle id="ring" />
     <g id="targets">
       <Target
-        ref="target"
+        ref="target-element"
         v-for="target in targetList"
         :key="target.id"
+        :id="target.id"
+        :radius="radius"
+        :thickness="thickness"
+        :type="target.type"
+        :color="target.color"
+        :start="target.start"
+        :end="target.end"
+        :bonusStart="target.bonusStart"
+        :bonusEnd="target.bonusEnd"
+        :lifetime="target.lifetime"
+        :hits="target.hits"
         :target="target"
         @remove="removeTarget"
       />
     </g>
     <g id="shadows">
       <Shadow
+        ref="shadow-element"
         v-for="shadow in shadowList"
         :key="shadow.id"
-        :shadow="shadow"
+        :id="shadow.id"
+        :radius="radius"
+        :thickness="thickness"
+        :angle="shadow.angle"
         @remove="removeShadow"
       />
     </g>
@@ -44,8 +59,15 @@ export default {
     shadowList: [],
   }),
   computed: {
+    activeTargets() {
+      if (this.targetList.length <= 0) return [];
+      return this.targets.filter((x) => x.active).map((x) => x.toObject());
+    },
     targets() {
-      return this.$refs["target"] ?? [];
+      return this.$refs["target-element"] ?? [];
+    },
+    shadows() {
+      return this.$refs["shadow-element"] ?? [];
     },
     pointer() {
       return this.$refs["pointer"];
@@ -67,14 +89,13 @@ export default {
     },
   },
   methods: {
-    addTarget(type, angle, color, size, bonusSize, lifetime) {
+    addTarget(type, angle, color, size, bonusSize, lifetime, hits) {
       this.targetList.push({
         id: uuid.v4(),
-        radius: this.radius,
-        thickness: this.thickness,
         type,
         color,
         lifetime,
+        hits,
         start: angle - size,
         end: angle + size,
         bonusStart: bonusSize ? angle - bonusSize : undefined,
@@ -84,14 +105,15 @@ export default {
     removeTarget(id) {
       this.targetList = this.targetList.filter((x) => x.id !== id);
     },
-    fadeTarget(id) {
-      this.targets.find((x) => x.id === id)?.fade();
+    fadeTarget(id, inactivate = false) {
+      this.targets.find((x) => x.id === id)?.fade(inactivate);
+    },
+    hitTarget(id) {
+      this.targets.find((x) => x.id === id)?.handleHit();
     },
     addShadow(angle) {
       this.shadowList.push({
         id: uuid.v4(),
-        radius: this.radius,
-        thickness: this.thickness,
         angle,
       });
     },
