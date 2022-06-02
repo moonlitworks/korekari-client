@@ -50,22 +50,6 @@ export default {
     receive(data) {
       console.log("received from server", data);
     },
-    spawnPlayer() {
-      this.$emit("setPlayer", {
-        name: "Hunter",
-        level: 1,
-        maxHp: 100,
-        items: [
-          {
-            id: "STICK",
-            type: "WEAPON",
-            name: "Stick",
-            element: "Neutral",
-            damage: 1,
-          },
-        ],
-      });
-    },
     spawnMonster(delay) {
       setTimeout(() => {
         this.$emit("setMonster", {

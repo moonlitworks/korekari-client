@@ -30,7 +30,7 @@ export default {
       image: require("@/assets/sprites/worm/attack.png"),
       width: 900,
       height: 900,
-      cuts: 15,
+      cuts: 16,
       duration: "0.8s",
       loop: "1",
       fillMode: "forwards",

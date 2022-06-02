@@ -86,6 +86,9 @@ export default {
     duration() {
       return this.currentSpriteOptions?.duration;
     },
+    direction() {
+      return this.currentSpriteOptions?.direction;
+    },
     fillMode() {
       return this.currentSpriteOptions?.fillMode;
     },
