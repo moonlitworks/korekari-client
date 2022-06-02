@@ -21,6 +21,10 @@
     />
     <Combo ref="combo" />
     <Interaction @interaction="interaction" />
+    <Spectate
+      :isSpectateMode="isSpectateMode"
+      @toggleSpectateMode="toggleSpectateMode"
+    />
     <Server
       ref="server"
       :gm="this"
@@ -36,6 +40,7 @@ import Ring from "./game-components/ring.vue";
 import Player from "./game-components/player.vue";
 import Monster from "./game-components/monster.vue";
 import Combo from "./game-components/combo.vue";
+import Spectate from "./game-components/spectate.vue";
 import Interaction from "./game-components/interaction.vue";
 import Server from "./game-components/server.vue";
 
@@ -46,12 +51,27 @@ export default {
     Player,
     Monster,
     Combo,
+    Spectate,
     Interaction,
     Server,
   },
   data: () => ({
-    playerObject: undefined,
+    isSpectateMode: true,
     monsterObject: undefined,
+    playerObject: {
+      name: "Hunter",
+      level: 1,
+      maxHp: 100,
+      items: [
+        {
+          id: "STICK",
+          type: "WEAPON",
+          name: "Stick",
+          element: "Neutral",
+          damage: 1,
+        },
+      ],
+    },
   }),
   computed: {
     player() {
@@ -86,6 +106,7 @@ export default {
   methods: {
     interaction() {
       const hitInfo = this.ring.hit();
+      if (this.isSpectateMode) return;
       if (hitInfo.hits.length <= 0) {
         // dont damage player if no target is in ring
         if (this.monsterIsAlive) {
@@ -126,20 +147,25 @@ export default {
         });
       }
     },
+    toggleSpectateMode() {
+      this.isSpectateMode = !this.isSpectateMode;
+      if (this.isSpectateMode) {
+        this.ring.targetList.forEach((x) => this.ring.fadeTarget(x.id, true));
+      }
+    },
     addTarget({ angle, hits, type, color }) {
       if (type === "DEFEND") this.monster.setState("ATTACKING");
+      if (this.isSpectateMode) return;
       this.ring.addTarget(type, angle, color, 10, 2, 3000, hits);
     },
     missedTarget(target) {
+      if (this.isSpectateMode) return;
       if ([undefined, "DEAD", "DYING"].includes(this.monster.state)) return;
       switch (target.type) {
         case "DEFEND":
           this.player?.receiveDamage(20);
           break;
       }
-    },
-    setPlayer(playerObject) {
-      this.playerObject = playerObject;
     },
     setMonster(monsterObject) {
       this.monsterObject = monsterObject;

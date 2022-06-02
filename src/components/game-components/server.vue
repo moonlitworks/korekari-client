@@ -52,7 +52,7 @@ export default {
     },
     spawnPlayer() {
       this.$emit("setPlayer", {
-        name: "Player1",
+        name: "Hunter",
         level: 1,
         maxHp: 100,
         items: [
