@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.8](https://github.com/moonlitworks/korekari-client/compare/v0.2.7...v0.2.8) (2022-06-02)
+
+
+### Features
+
+* **core:** pseudo progression algorithm ([9da4e13](https://github.com/moonlitworks/korekari-client/commit/9da4e1339cc1fad7eced97cb97398c841b66441c)), closes [#5](https://github.com/moonlitworks/korekari-client/issues/5)
+
+
+### Bug Fixes
+
+* **core:** remove call to missing server method ([5921c36](https://github.com/moonlitworks/korekari-client/commit/5921c364e385a4879772cfcf17819430a7a870d9))
+
 ### [0.2.7](https://github.com/moonlitworks/korekari-client/compare/v0.2.6...v0.2.7) (2022-06-02)
 
 ### [0.2.6](https://github.com/moonlitworks/korekari-client/compare/v0.2.5...v0.2.6) (2022-06-02)
