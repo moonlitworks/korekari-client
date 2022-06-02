@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { calculateX, calculateY } from "../../utils";
 export default {
   name: "Sword",
   props: {
@@ -19,25 +20,14 @@ export default {
     translateOffset: 53,
   }),
   computed: {
-    translateX() {
-      return this.translateOffset * this.calculateAngleX(this.angle);
-    },
-    translateY() {
-      return this.translateOffset * this.calculateAngleY(this.angle);
-    },
     transform() {
-      return `translateX(${this.translateX}%) translateY(${this.translateY}%) scale(0.07) rotate(30deg)`;
-    },
-  },
-  methods: {
-    calculateAngleX(angle) {
-      return Math.cos(this.toRadians(angle));
-    },
-    calculateAngleY(angle) {
-      return Math.sin(this.toRadians(angle));
-    },
-    toRadians(deg) {
-      return (deg + 270) * (Math.PI / 180);
+      return `translateX(${calculateX(
+        this.angle,
+        this.translateOffset
+      )}%) translateY(${calculateY(
+        this.angle,
+        this.translateOffset
+      )}%) scale(0.07) rotate(30deg)`;
     },
   },
 };
@@ -46,6 +36,6 @@ export default {
 <style scoped>
 path {
   transform: v-bind(transform);
-  transform-origin: 50% 50%;
+  transform-origin: center;
 }
 </style>

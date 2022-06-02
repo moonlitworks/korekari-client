@@ -1,55 +1,28 @@
 <template>
-  <Sprite
-    id="sprite"
-    :class="{ flinch: flinch, critical: critical }"
-    :image="require('@/assets/sprites/worm/idle.png')"
-    :width="900"
-    :height="900"
-    :cuts="9"
-    :duration="'1.0s'"
-    :loop="'infinite'"
-  />
+  <div>
+    <component
+      :is="sprite"
+      :class="{ critical: critical }"
+      :state="state"
+      @setState="setState"
+      @dead="dead"
+    ></component>
 
-  <!-- <Sprite
-    id="sprite"
-    :image="require('@/assets/sprites/worm/attack.png')"
-    :width="900"
-    :height="900"
-    :cuts="15"
-    :duration="'1.0s'"
-    :loop="'1'"
-    :fillMode="'forwards'"
-    :direction="'normal'"
-  /> -->
+    <div id="monster-hp-bar">
+      <div id="monster-hp"></div>
+    </div>
 
-  <!-- <Sprite
-    id="sprite"
-    :image="require('@/assets/sprites/worm/death.png')"
-    :width="900"
-    :height="900"
-    :cuts="7"
-    :duration="'1.0s'"
-    :loop="'1'"
-    :fillMode="'forwards'"
-    :direction="'normal'"
-  /> -->
-
-  <div id="monster-hp-bar">
-    <div id="monster-hp"></div>
-  </div>
-
-  <div id="monster-info">
-    <div>{{ monster.name }} (Lv {{ monster.level }})</div>
+    <div id="monster-info">
+      <div>{{ monster.name }} (Lv {{ monster.level }})</div>
+    </div>
   </div>
 </template>
 
 <script>
-import Sprite from "./sprite.vue";
+import { shallowRef } from "vue";
+import Worm from "../sprites/worm.vue";
 export default {
   name: "Monster",
-  components: {
-    Sprite,
-  },
   emits: ["dying", "dead"],
   props: {
     monster: {
@@ -76,20 +49,24 @@ export default {
     },
   },
   data: () => ({
-    status: "ACTIVE", // "ENTERING", "LEAVING", "DYING"
+    state: "IDLE", // "ENTERING", "LEAVING", "DYING"
     hp: 0,
-    flinch: false,
     critical: false,
+    sprite: undefined,
   }),
   mounted() {
     this.hp = this.monster.maxHp;
-    this.status = "ACTIVE";
+    this.state = "IDLE";
     this.flinch = false;
     this.critical = false;
+    this.sprite = shallowRef(Worm);
   },
   computed: {
     isActive() {
-      return this.status === "ACTIVE";
+      return this.state === "IDLE";
+    },
+    isAlive() {
+      return !["DEAD", "DYING", undefined].includes(this.state);
     },
     hpPercentage() {
       const pct = (this.hp / this.monster.maxHp) * 100;
@@ -100,17 +77,27 @@ export default {
     receiveDamage(damage, critical) {
       this.hp -= damage;
       setTimeout(() => {
-        this.flinch = false;
         this.critical = false;
       }, 100);
-      this.flinch = true;
       if (critical) {
         this.critical = true;
       }
       if (this.hp <= 0) {
-        this.status === "DYING";
-        this.$emit("dead");
+        this.hp = 0;
+        this.setState("DYING");
+        this.$emit("dying");
+      } else {
+        this.setState("FLINCHING");
       }
+    },
+    dead() {
+      this.$emit("dead");
+    },
+    setState(state) {
+      // don't flinch when attacking
+      if (state === "FLINCHING" && this.state === "ATTACKING") return;
+
+      if (this.state !== state) this.state = state;
     },
   },
 };
@@ -122,10 +109,6 @@ export default {
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
-}
-
-#sprite.flinch {
-  filter: grayscale(100%);
 }
 
 #sprite.critical {

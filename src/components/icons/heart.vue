@@ -10,24 +10,23 @@
 </template>
 
 <script>
-import { calculateX, calculateY } from "./icon-utils";
+import { calculateX, calculateY } from "../../utils";
 export default {
   name: "Heart",
   props: {
     angle: Number,
   },
   data: () => ({
-    translateOffsetX: 53,
-    translateOffsetY: 53,
+    translateOffset: 53,
   }),
   computed: {
     transform() {
       return `translateX(${calculateX(
         this.angle,
-        this.translateOffsetX
+        this.translateOffset
       )}%) translateY(${calculateY(
         this.angle,
-        this.translateOffsetY
+        this.translateOffset
       )}%) scale(0.07)`;
     },
   },

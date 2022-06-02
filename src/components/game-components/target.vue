@@ -10,6 +10,7 @@
 import Arc from "./arc.vue";
 import Sword from "../icons/sword.vue";
 import Heart from "../icons/heart.vue";
+import Shield from "../icons/shield.vue";
 export default {
   name: "Target",
   components: {
@@ -37,12 +38,15 @@ export default {
   computed: {
     icon() {
       switch (this.type) {
+        case "DEFEND":
+          return Shield;
         case "HEAL":
           return Heart;
         case "ATTACK":
         case "SKILL":
-        default:
           return Sword;
+        default:
+          return undefined;
       }
     },
     frailty() {
@@ -96,7 +100,15 @@ export default {
       if (inactivate) this.active = false;
       this.fading = true;
       setTimeout(() => {
+        // deactivate if not already
         this.active = false;
+
+        // emit if missed
+        if (this.hitsLeft !== undefined && this.hitsLeft > 0) {
+          this.$emit("missed", this.toObject());
+        }
+
+        // request to be removed
         this.$emit("remove", this.id);
       }, 500);
     },

@@ -21,6 +21,7 @@
         :hits="target.hits"
         :target="target"
         @remove="removeTarget"
+        @missed="missedTarget"
       />
     </g>
     <g id="shadows">
@@ -112,6 +113,9 @@ export default {
         bonusEnd: bonusSize ? angle + bonusSize : undefined,
       });
     },
+    missedTarget(target) {
+      this.$emit("missedTarget", target);
+    },
     removeTarget(id) {
       this.targetList = this.targetList.filter((x) => x.id !== id);
     },
@@ -181,6 +185,7 @@ export default {
   width: 500px;
   height: 500px;
   pointer-events: none;
+  transform-box: fill-box;
   transform-origin: 50% 50%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;

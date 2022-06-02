@@ -7,3 +7,5 @@ export const calculateX = (angle, offset) => {
 export const calculateY = (angle, offset) => {
   return offset * Math.sin(toRadians(angle));
 }
+
+export const isLargeArc = (start, end) => Math.abs((end - start) % 360) > 180

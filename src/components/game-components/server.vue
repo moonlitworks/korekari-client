@@ -11,30 +11,30 @@ export default {
   data: () => ({
     connected: false,
   }),
-  mounted() {
-    // mock server events
-    setInterval(() => {
-      this.addTargetIfEmpty();
-    }, 1000);
-  },
   methods: {
     addTargetIfEmpty() {
-      const hasMonster = this.gm.monsterObject !== undefined;
-      const canAdd = this.gm.ring.activeTargets.length < 2;
+      const hasMonster = ![undefined, "DEAD", "DYING"].includes(
+        this.gm.monster?.state
+      );
+      const canAdd = this.gm.ring.activeTargets.length < 4;
       if (!hasMonster || !canAdd) return;
 
       const angle = Math.floor(Math.random() * 361);
       const hits = 1;
       const type =
-        Math.random() > 0.95
-          ? "SKILL"
-          : Math.random() > 0.8
+        Math.random() < 0.8
+          ? "ATTACK"
+          : Math.random() < 0.8
+          ? "DEFEND"
+          : Math.random() < 0.8
           ? "HEAL"
-          : "ATTACK";
+          : "SKILL";
       const color = (() => {
         switch (type) {
+          case "DEFEND":
+            return "green";
           case "HEAL":
-            return "orange";
+            return "gold";
           case "SKILL":
             return "blue";
           case "ATTACK":
@@ -69,10 +69,10 @@ export default {
     spawnMonster(delay) {
       setTimeout(() => {
         this.$emit("setMonster", {
-          name: "Goop",
+          name: "Dragorm",
           level: 1,
           maxHp: 100,
-          element: "NEUTRAL",
+          element: "FIRE",
           hitConfig: {
             normalWidth: 50,
             criticalWidth: 35,
@@ -82,9 +82,9 @@ export default {
           },
           skills: [
             {
-              id: "SLIME",
-              name: "Slime",
-              element: "NEUTRAL",
+              id: "FIRE_BREATH",
+              name: "Fire Breath",
+              element: "FIRE",
               damage: 10,
               dodgeWidth: 40,
             },
