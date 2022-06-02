@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/moonlitworks/korekari-client/compare/v0.2.4...v0.2.5) (2022-06-02)
+
+
+### Features
+
+* **core:** dynamic sprite, defend action and missed consequence ([2585377](https://github.com/moonlitworks/korekari-client/commit/2585377d82da5b619655182e5ede2f6dcfb11cc6))
+* **sprites:** add sprite support ([e730037](https://github.com/moonlitworks/korekari-client/commit/e730037799ac25c1152e3f85e81304ac90484e80))
+
+
+### Bug Fixes
+
+* **ring:** make targets reactive ([783464d](https://github.com/moonlitworks/korekari-client/commit/783464da98733fd5d0296e004bdc17cf8432fbf3))
+
 ### [0.2.4](https://github.com/moonlitworks/korekari-client/compare/v0.2.3...v0.2.4) (2022-06-01)
 
 
