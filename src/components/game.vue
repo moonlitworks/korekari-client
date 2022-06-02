@@ -97,7 +97,6 @@ export default {
     },
   },
   mounted() {
-    this.server.spawnPlayer();
     this.server.spawnMonster(0);
     setInterval(() => {
       this.server.addTargetIfEmpty();
