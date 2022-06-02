@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/moonlitworks/korekari-client/compare/v0.2.5...v0.2.6) (2022-06-02)
+
+
+### Features
+
+* **spectate:** add spectate mode ([dbc3b1e](https://github.com/moonlitworks/korekari-client/commit/dbc3b1e7a0e4ad0e8d4b8e596a64afc73c63ae3c)), closes [#8](https://github.com/moonlitworks/korekari-client/issues/8)
+
 ### [0.2.5](https://github.com/moonlitworks/korekari-client/compare/v0.2.4...v0.2.5) (2022-06-02)
 
 
