@@ -97,13 +97,10 @@ export default {
     this.sprite.addEventListener("animationend", () => {
       switch (this.state) {
         case "DYING":
-        case "DEAD":
           this.$emit("dead");
           break;
         case "ATTACKING":
         case "FLINCHING":
-        case "IDLE":
-        default:
           this.$emit("setState", "IDLE");
       }
     });
@@ -116,6 +113,7 @@ export default {
     },
     handleStateChange(state) {
       if (this.state === "DYING" && state === "DEAD") return;
+      if (this.state === "ENTERING" && state === "IDLE") return;
       this.restartAnimation();
     },
     spriteByState(state) {
@@ -128,6 +126,7 @@ export default {
         case "DEAD":
           return this.death;
         case "IDLE":
+        case "ENTERING":
         default:
           return this.idle;
       }

@@ -12,11 +12,14 @@
 export default {
   name: "Interaction",
   mounted() {
-    this.$refs["interaction-screen"].focus();
+    this.focus();
   },
   methods: {
     interaction() {
       this.$emit("interaction");
+    },
+    focus() {
+      this.$refs["interaction-screen"].focus();
     },
   },
 };

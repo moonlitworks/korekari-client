@@ -49,7 +49,8 @@ export default {
     },
   },
   data: () => ({
-    state: "IDLE", // "ENTERING", "LEAVING", "DYING"
+    isActive: false,
+    state: "IDLE",
     hp: 0,
     critical: false,
     sprite: undefined,
@@ -57,16 +58,19 @@ export default {
   mounted() {
     this.hp = this.monster.maxHp;
     this.state = "IDLE";
-    this.flinch = false;
     this.critical = false;
     this.sprite = shallowRef(Worm);
+
+    setTimeout(() => {
+      this.isActive = true;
+    }, 2000);
   },
   computed: {
-    isActive() {
-      return this.state === "IDLE";
-    },
     isAlive() {
-      return !["DEAD", "DYING", undefined].includes(this.state);
+      return (
+        !["ENTERING", "DEAD", "DYING", undefined].includes(this.state) &&
+        this.isActive
+      );
     },
     hpPercentage() {
       const pct = (this.hp / this.monster.maxHp) * 100;
@@ -75,13 +79,12 @@ export default {
   },
   methods: {
     receiveDamage(damage, critical) {
-      this.hp -= damage;
       setTimeout(() => {
         this.critical = false;
       }, 100);
-      if (critical) {
-        this.critical = true;
-      }
+      if (critical) this.critical = true;
+
+      this.hp -= damage;
       if (this.hp <= 0) {
         this.hp = 0;
         this.setState("DYING");
@@ -91,6 +94,7 @@ export default {
       }
     },
     dead() {
+      this.isActive = false;
       this.$emit("dead");
     },
     setState(state) {

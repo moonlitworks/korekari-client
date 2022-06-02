@@ -13,11 +13,8 @@ export default {
   }),
   methods: {
     addTargetIfEmpty() {
-      const hasMonster = ![undefined, "DEAD", "DYING"].includes(
-        this.gm.monster?.state
-      );
       const canAdd = this.gm.ring.activeTargets.length < 4;
-      if (!hasMonster || !canAdd) return;
+      if (!this.gm.monsterIsAlive || !canAdd) return;
 
       const angle = Math.floor(Math.random() * 361);
       const hits = 1;
@@ -50,12 +47,12 @@ export default {
     receive(data) {
       console.log("received from server", data);
     },
-    spawnMonster(delay) {
+    spawnMonster(level, delay) {
       setTimeout(() => {
         this.$emit("setMonster", {
           name: "Dragorm",
-          level: 1,
-          maxHp: 100,
+          level,
+          maxHp: 100 * level,
           element: "FIRE",
           hitConfig: {
             normalWidth: 50,

@@ -6,12 +6,14 @@
   </div>
 
   <div id="player-info">
-    <div>{{ player.name }} (Lv {{ player.level }})</div>
+    <div>{{ player.name }} (Lv {{ player.level }} | Exp {{ player.exp }})</div>
   </div>
 </template>
 
 <script>
 export default {
+  name: "Player",
+  emits: ["gameOver"],
   props: {
     player: {
       name: String,
@@ -30,6 +32,7 @@ export default {
   },
   data: () => ({
     hp: 0,
+    exp: 0,
     hurt: false,
   }),
   mounted() {
@@ -48,7 +51,10 @@ export default {
         this.hurt = false;
       }, 500);
       this.hurt = true;
-      if (this.hp <= 0) this.hp = this.player.maxHp;
+      if (this.hp <= 0) {
+        this.hp = 0;
+        this.$emit("gameOver");
+      }
     },
     heal(value) {
       this.hp += value;
