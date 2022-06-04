@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/moonlitworks/korekari-client/compare/v0.2.8...v0.2.9) (2022-06-04)
+
+
+### Features
+
+* **core:** implemented dynamic rings and ephemeral texts ([3b317cd](https://github.com/moonlitworks/korekari-client/commit/3b317cd1afedd5f2b8ba0f3e624aec8877837120))
+
 ### [0.2.8](https://github.com/moonlitworks/korekari-client/compare/v0.2.7...v0.2.8) (2022-06-02)
 
 
