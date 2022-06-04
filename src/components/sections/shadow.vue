@@ -1,5 +1,5 @@
 <template>
-  <circle class="pointer-shadow" />
+  <circle class="pointer-shadow" ref="pointer-shadow" />
 </template>
 
 <script>
@@ -22,10 +22,10 @@ export default {
       return `${(this.thickness / 2) * 2}px`;
     },
   },
-  created() {
-    setTimeout(() => {
+  mounted() {
+    this.$refs["pointer-shadow"].addEventListener("animationend", () => {
       this.$emit("remove", this.id);
-    }, 1000);
+    });
   },
 };
 </script>

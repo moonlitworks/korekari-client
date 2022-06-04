@@ -39,12 +39,8 @@ export default {
       return this.$refs["unit"];
     },
   },
-  updated() {
-    console.log(this.textList);
-  },
   methods: {
     addText(value, color) {
-      console.log(this.colorTransformer?.(value));
       this.textList.push({
         id: uuid.v4(),
         text: this.textTransformer?.(value) ?? value,

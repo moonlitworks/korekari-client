@@ -1,37 +1,35 @@
 <template>
-  <div id="feedback" :class="{ hurt: hurt }"></div>
+  <div>
+    <div id="feedback" :class="{ hurt: hurt }"></div>
 
-  <!-- <div id="player-hp-bar">
-    <div id="player-hp"></div>
-  </div> -->
+    <DynamicRing
+      id="player-hp"
+      ref="player-hp"
+      :side="100"
+      :color="'white'"
+      :opacity="0"
+      :width="5"
+      :arc="{
+        color: 'red',
+        opacity: 1,
+        startPercent: 1,
+        startSpeed: 0,
+      }"
+    />
 
-  <DynamicRing
-    id="player-hp"
-    ref="player-hp"
-    :side="100"
-    :color="'white'"
-    :opacity="0"
-    :width="5"
-    :arc="{
-      color: 'red',
-      opacity: 1,
-      startPercent: 1,
-      startSpeed: 0,
-    }"
-  />
+    <EphemeralText
+      id="hp-alert"
+      ref="hp-alert"
+      :duration="0.5"
+      :endXPosition="'0px'"
+      :endYPosition="'-20px'"
+      :textTransformer="ephemeralText.textTransformer"
+      :colorTransformer="ephemeralText.colorTransformer"
+    />
 
-  <EphemeralText
-    id="hp-alert"
-    ref="hp-alert"
-    :duration="1"
-    :endXPosition="'0px'"
-    :endYPosition="'-12px'"
-    :textTransformer="ephemeralText.textTransformer"
-    :colorTransformer="ephemeralText.colorTransformer"
-  />
-
-  <div id="player-info">
-    <div>{{ player.name }}</div>
+    <div id="player-info">
+      <div>{{ player.name }}</div>
+    </div>
   </div>
 </template>
 
@@ -89,6 +87,7 @@ export default {
     setHp(hp) {
       const difference = hp - this.hp;
       const newHp = Math.max(0, Math.min(hp, this.player.maxHp));
+      if (newHp < this.hp) this.showHurt();
       this.hp = newHp;
       this.$refs["player-hp"].setToPercent(this.hp / this.player.maxHp, 0.5);
       this.$refs["hp-alert"].addText(difference);
@@ -98,6 +97,9 @@ export default {
     },
     receiveDamage(damage) {
       this.setHp(this.hp - damage);
+      this.showHurt();
+    },
+    showHurt() {
       setTimeout(() => {
         this.hurt = false;
       }, 500);

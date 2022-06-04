@@ -26,9 +26,9 @@
     <EphemeralText
       id="hp-alert"
       ref="hp-alert"
-      :duration="1"
+      :duration="0.5"
       :endXPosition="'0px'"
-      :endYPosition="'-12px'"
+      :endYPosition="'-20px'"
       :textTransformer="ephemeralText.textTransformer"
       :colorTransformer="ephemeralText.colorTransformer"
     />

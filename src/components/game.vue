@@ -1,11 +1,13 @@
 <template>
   <div id="game-screen">
-    <Player
-      v-if="playerObject"
-      ref="player"
-      :player="playerObject"
-      @gameOver="setGameOver"
-    />
+    <transition>
+      <Player
+        v-if="!!playerObject"
+        ref="player"
+        :player="playerObject"
+        @gameOver="setGameOver"
+      />
+    </transition>
     <transition>
       <Monster
         v-if="!!monsterObject"
@@ -30,11 +32,15 @@
       :isSpectateMode="isSpectateMode"
       @toggleSpectateMode="toggleSpectateMode"
     />
-    <GameOver v-if="gameOver" @restart="restartGame" />
+    <GameOver v-if="gameOver" @restart="startGame" />
     <Server
       ref="server"
       :gm="this"
+      @initGame="initGame"
       @setMonster="setMonster"
+      @playerDamage="playerDamage"
+      @playerDealt="playerDealt"
+      @playerHp="playerHp"
       @addTarget="addTarget"
     />
   </div>
@@ -79,6 +85,7 @@ export default {
       return this.$refs["monster"];
     },
     monsterIsAlive() {
+      if (!this.monsterObject) return false;
       return !!this.monster && this.monster.isAlive;
     },
     ring() {
@@ -96,148 +103,36 @@ export default {
     },
   },
   mounted() {
-    setInterval(() => {
-      this.server.addTargetIfEmpty();
-    }, 1000);
-    this.restartGame();
+    this.startGame();
   },
   methods: {
-    restartGame() {
-      this.monsterObject = undefined;
-      this.playerObject = undefined;
-
-      requestAnimationFrame(() => {
-        this.gameOver = false;
-        this.isSpectateMode = true;
-        this.playerObject = {
-          name: "Hunter",
-          exp: 0,
-          level: 1,
-          maxHp: 100,
-          items: [
-            {
-              id: "STICK",
-              type: "WEAPON",
-              name: "Stick",
-              element: "Neutral",
-              damage: 1,
-            },
-          ],
-        };
-        this.server.spawnMonster(1, 0);
-        this.interactionEl.focus();
+    startGame() {
+      this.server.send({
+        type: "player:register",
+        name: "Hunter",
       });
     },
+    restartAnimation(cb) {
+      requestAnimationFrame(() => cb());
+    },
     setGameOver() {
-      this.toggleSpectateMode(true);
       this.gameOver = true;
     },
     registerCombo(value) {
       if (value > this.highestCombo) this.highestCombo = value;
     },
-    calcHit() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(playerLevel / monsterLevel);
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcBonusHit() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(10 * (playerLevel / monsterLevel));
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcSkill() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(10 * (playerLevel / monsterLevel));
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcBonusSkill() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(50 * (playerLevel / monsterLevel));
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcMiss() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(20 * (monsterLevel / playerLevel));
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcCounter() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const hitRaw = Math.floor(5 * (playerLevel / monsterLevel));
-      return hitRaw > 1 ? hitRaw : 1;
-    },
-    calcHeal() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const healRaw = Math.floor(10 * (monsterLevel / playerLevel));
-      return healRaw > 10 ? healRaw : 10;
-    },
-    calcBonusHeal() {
-      const playerLevel = this.playerObject.level;
-      const monsterLevel = this.monsterObject.level;
-      if (!playerLevel || !monsterLevel) return 0;
-
-      const healRaw = Math.floor(50 * (monsterLevel / playerLevel));
-      return healRaw > 10 ? healRaw : 10;
-    },
     interaction() {
       const hitInfo = this.ring.hit();
-      if (this.isSpectateMode) return;
+      if (this.isSpectateMode || this.gameOver) return;
       if (hitInfo.hits.length <= 0) {
         // dont damage player if no target is in ring
         if (this.monsterIsAlive) {
-          this.player?.receiveDamage(3);
+          this.server.send({ type: "player:miss" });
           this.combo?.resetCombo();
         }
       } else {
         hitInfo.hits.forEach((hit) => {
-          if (hit.type === "HEAL") {
-            console.log("Heal!");
-            const healValue =
-              hit.hitType === "BONUS" ? this.calcBonusHeal() : this.calcHeal();
-            this.player?.heal(healValue);
-          } else if (hit.type === "SKILL") {
-            if (!this.monsterIsAlive) return;
-            if (hit.hitType === "BONUS") {
-              console.log("Bonus Skill!");
-              this.monster?.receiveDamage(this.calcBonusSkill(), true);
-            } else {
-              console.log("Skill!");
-              this.monster?.receiveDamage(this.calcSkill(), true);
-            }
-          } else if (hit.type === "ATTACK") {
-            if (!this.monsterIsAlive) return;
-            if (hit.hitType === "BONUS") {
-              console.log("Bonus Hit!");
-              this.monster?.receiveDamage(this.calcBonusHit(), true);
-            } else {
-              console.log("Hit!");
-              this.monster?.receiveDamage(this.calcHit());
-            }
-          } else if (hit.type === "DEFEND" && hit.hitType === "BONUS") {
-            console.log("Counter!");
-            this.monster?.receiveDamage(this.calcCounter(), true, true);
-          }
-
+          this.server.send({ type: "target:hit", hit });
           this.combo?.addCombo();
           this.ring.hitTarget(hit.id);
         });
@@ -248,23 +143,65 @@ export default {
       if (this.isSpectateMode) {
         this.ring.targetList.forEach((x) => this.ring.fadeTarget(x.id, true));
       }
+      this.interactionEl.focus();
     },
-    addTarget({ angle, hits, type, color }) {
-      if (type === "DEFEND") this.monster.setState("ATTACKING");
+    addTarget(data) {
+      if (data.type === "DEFEND") this.monster.setState("ATTACKING");
       if (this.isSpectateMode) return;
-      this.ring.addTarget(type, angle, color, 10, 2, 3000, hits);
+      const lifetime = data.expiry - new Date();
+      const angle = Math.floor(Math.random() * 361);
+      const color = ((type) => {
+        switch (type) {
+          case "DEFEND":
+            return "blue";
+          case "HEAL":
+            return "green";
+          case "SKILL":
+            return "orange";
+          case "ATTACK":
+          default:
+            return "red";
+        }
+      })(data.type);
+      this.ring.addTarget(
+        data.id,
+        data.type,
+        angle,
+        color,
+        data.size,
+        data.bonus,
+        lifetime,
+        1
+      );
     },
     missedTarget(target) {
       if (this.isSpectateMode) return;
       if ([undefined, "DEAD", "DYING"].includes(this.monster.state)) return;
-      switch (target.type) {
-        case "DEFEND":
-          this.player?.receiveDamage(this.calcMiss());
-          break;
-      }
+      this.server.send({
+        type: "target:miss",
+        target,
+      });
+    },
+    initGame({ player, monster }) {
+      this.playerObject = undefined;
+      this.monsterObject = undefined;
+      this.restartAnimation(() => {
+        this.playerObject = player;
+        this.monsterObject = monster;
+        this.gameOver = false;
+      });
     },
     setMonster(monsterObject) {
       this.monsterObject = monsterObject;
+    },
+    playerDamage(damage) {
+      this.player?.receiveDamage(damage);
+    },
+    playerDealt({ value, isCritical, isCounter }) {
+      this.monster?.receiveDamage(value, isCritical, isCounter);
+    },
+    playerHp(newHp) {
+      this.player?.setHp(newHp);
     },
     monsterDying() {
       this.ring.targetList.forEach((x) => {
@@ -292,19 +229,15 @@ export default {
 
       setTimeout(() => {
         this.monsterObject = undefined;
-        this.server.spawnMonster(nextLevel, 2000);
+        this.server.send({
+          type: "monster:fetch",
+          level: nextLevel,
+          delay: 2000,
+        });
       }, 1000);
     },
     rewardPlayer(exp, heal) {
-      console.log(`Gaining ${exp} exp and ${heal} heal!`);
       this.player.heal(heal);
-
-      if (this.playerObject) {
-        const levels = Math.floor((this.playerObject.exp + exp) / 100);
-        const excess = Math.floor((this.playerObject.exp + exp) % 100);
-        this.playerObject.exp = excess;
-        this.playerObject.level += levels;
-      }
     },
   },
 };

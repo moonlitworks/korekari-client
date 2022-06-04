@@ -99,9 +99,9 @@ export default {
     },
   },
   methods: {
-    addTarget(type, angle, color, size, bonusSize, lifetime, hits) {
+    addTarget(id, type, angle, color, size, bonus, lifetime, hits) {
       this.targetList.push({
-        id: uuid.v4(),
+        id: id ?? uuid.v4(),
         type,
         color,
         lifetime,
@@ -109,8 +109,8 @@ export default {
         angle,
         start: angle - size,
         end: angle + size,
-        bonusStart: bonusSize ? angle - bonusSize : undefined,
-        bonusEnd: bonusSize ? angle + bonusSize : undefined,
+        bonusStart: bonus ? angle - bonus : undefined,
+        bonusEnd: bonus ? angle + bonus : undefined,
       });
     },
     missedTarget(target) {
