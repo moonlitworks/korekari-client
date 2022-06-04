@@ -3,9 +3,9 @@
     :stroke="arc.color"
     :stroke-opacity="arc.opacity"
     :stroke-width="strokeWidth"
-    stroke-linecap="round"
-    fill="none"
+    :stroke-linecap="round ? 'round' : 'butt'"
     :filter="filter"
+    fill="none"
     :d="calculatePathD(arc.start, arc.end)"
   />
 </template>
@@ -15,7 +15,6 @@ import { calculateX, calculateY, isLargeArc } from "../../utils";
 export default {
   name: "Arc",
   props: {
-    frailty: String,
     arc: {
       radius: Number,
       thickness: Number,
@@ -23,19 +22,16 @@ export default {
       opacity: Number,
       start: Number,
       end: Number,
+      round: Boolean,
+      filter: String,
     },
   },
   computed: {
+    round() {
+      return this.arc.round ? "round" : "butt";
+    },
     filter() {
-      switch (this.frailty) {
-        case "BRITTLE":
-          return `invert(40%)`;
-        case "WORN":
-          return `invert(20%)`;
-        case "STURDY":
-        default:
-          return `invert(0%)`;
-      }
+      return this.arc.filter ?? "scale(1.0)";
     },
     strokeWidth() {
       return `${this.arc.thickness}px`;
@@ -56,6 +52,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

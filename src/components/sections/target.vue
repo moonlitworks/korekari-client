@@ -34,6 +34,7 @@ export default {
     active: true,
     fading: false,
     hitsLeft: undefined,
+    round: true,
   }),
   computed: {
     icon() {
@@ -73,6 +74,7 @@ export default {
         color: this.color,
         start: this.start,
         end: this.end,
+        round: this.round,
         opacity: this.hasBonusArc ? 0.4 : 0.9,
       };
     },
@@ -83,6 +85,7 @@ export default {
         color: this.color,
         start: this.bonusStart,
         end: this.bonusEnd,
+        round: this.round,
         opacity: 0.9,
       };
     },

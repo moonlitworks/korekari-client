@@ -1,19 +1,20 @@
 <template>
-  <div id="sprite" ref="sprite" class="run-animation"></div>
+  <div id="sprite" ref="sprite" :class="{ 'run-animation': animate }"></div>
 </template>
 
 <script>
+import { watch } from "vue";
 export default {
   name: "Sprite",
   props: {
     state: String,
+    fps: Number,
     idle: {
       image: String,
       width: Number,
       height: Number,
       cuts: Number,
-      duration: String,
-      loop: String,
+      loop: Number | "infinite",
       fillMode: String,
       direction: String,
     },
@@ -22,8 +23,7 @@ export default {
       width: Number,
       height: Number,
       cuts: Number,
-      duration: String,
-      loop: String,
+      loop: Number | "infinite",
       fillMode: String,
       direction: String,
     },
@@ -32,8 +32,7 @@ export default {
       width: Number,
       height: Number,
       cuts: Number,
-      duration: String,
-      loop: String,
+      loop: Number | "infinite",
       fillMode: String,
       direction: String,
     },
@@ -42,85 +41,97 @@ export default {
       width: Number,
       height: Number,
       cuts: Number,
-      duration: String,
-      loop: String,
+      loop: Number | "infinite",
       bgPosition: String,
       fillMode: String,
       direction: String,
     },
   },
+  data: () => ({
+    animate: false,
+    currentSprite: undefined,
+    defaults: {
+      backgroundImage: "none",
+      cuts: 0,
+      spriteWidth: "0px",
+      spriteHeight: "0px",
+      endBackgroundPosition: "0px",
+      loop: 1,
+      duration: "0s",
+      direction: "normal",
+      fillMode: "forwards",
+    },
+  }),
   computed: {
-    sprite() {
+    hasSprite() {
+      return !!this.currentSprite;
+    },
+    spriteElement() {
       return this.$refs["sprite"];
     },
-    currentSpriteOptions() {
-      const sprite = this.spriteByState(this.state);
-      this.handleStateChange(this.state);
-      return sprite ?? this.idle;
-    },
     backgroundImage() {
-      if (!this.currentSpriteOptions) return undefined;
-      return `url(${this.currentSpriteOptions.image})`;
+      if (!this.hasSprite) return `none`;
+      return `url(${this.currentSprite.image})`;
     },
-    steps() {
-      if (!this.currentSpriteOptions) return undefined;
-      return `steps(${this.currentSpriteOptions.cuts})`;
+    cuts() {
+      if (!this.hasSprite) return this.defaults.cuts;
+      return this.currentSprite.cuts;
     },
     spriteWidth() {
-      if (!this.currentSpriteOptions) return undefined;
-      return `${this.currentSpriteOptions.width}px`;
+      if (!this.hasSprite) return this.defaults.spriteWidth;
+      return `${this.currentSprite.width}px`;
     },
     spriteHeight() {
-      if (!this.currentSpriteOptions) return undefined;
-      return `${this.currentSpriteOptions.height}px`;
+      if (!this.hasSprite) return this.defaults.spriteHeight;
+      return `${this.currentSprite.height}px`;
     },
     endBackgroundPosition() {
-      if (!this.currentSpriteOptions) return undefined;
-      return `${
-        -this.currentSpriteOptions.width * this.currentSpriteOptions.cuts
-      }px`;
+      if (!this.hasSprite) return this.defaults.endBackgroundPosition;
+      return `${-(this.currentSprite.width * this.cuts)}px`;
+    },
+    steps() {
+      return `steps(${this.cuts})`;
     },
     loop() {
-      return this.currentSpriteOptions?.loop;
+      if (!this.hasSprite) return this.defaults.loop;
+      return this.currentSprite.loop ?? this.defaults.loop;
     },
     duration() {
-      return this.currentSpriteOptions?.duration;
+      if (!this.hasSprite) return this.defaults.duration;
+      return `${this.cuts / this.fps}s`;
     },
     direction() {
-      return this.currentSpriteOptions?.direction;
+      if (!this.hasSprite) return this.defaults.direction;
+      return this.currentSprite.direction ?? this.defaults.direction;
     },
     fillMode() {
-      return this.currentSpriteOptions?.fillMode;
+      if (!this.hasSprite) return this.defaults.fillMode;
+      return this.currentSprite.fillMode ?? this.defaults.fillMode;
     },
   },
   mounted() {
-    this.sprite.addEventListener("animationend", () => {
-      switch (this.state) {
-        case "DYING":
-          this.$emit("dead");
-          break;
-        case "ATTACKING":
-        case "FLINCHING":
-          this.$emit("setState", "IDLE");
-      }
-    });
+    this.initializeSprite();
   },
   methods: {
-    restartAnimation() {
-      this.sprite.classList.remove("run-animation");
-      void this.sprite.offsetWidth;
-      this.sprite.classList.add("run-animation");
+    initializeSprite() {
+      this.spriteElement.addEventListener(
+        "animationend",
+        this.handleAnimationEnd.bind(this)
+      );
+      watch(() => this.state, this.handleStateChange.bind(this));
+      this.setSprite(this.idle, true);
     },
-    handleStateChange(state) {
-      if (this.state === "DYING" && state === "DEAD") return;
-      if (this.state === "ENTERING" && state === "IDLE") return;
-      this.restartAnimation();
+    shouldRestartAnimation(newState) {
+      if (this.state === "DYING" && newState === "DEAD") return false;
+      if (this.state === "ENTERING" && newState === "IDLE") return false;
+      return true;
     },
     spriteByState(state) {
       switch (state) {
         case "ATTACKING":
           return this.attack;
         case "FLINCHING":
+        case "COUNTERED":
           return this.flinch;
         case "DYING":
         case "DEAD":
@@ -131,19 +142,47 @@ export default {
           return this.idle;
       }
     },
+    handleAnimationEnd() {
+      switch (this.state) {
+        case "DYING":
+          this.$emit("dead");
+          break;
+        case "ATTACKING":
+        case "FLINCHING":
+        case "COUNTERED":
+        case "ENTERING":
+          this.$emit("setState", "IDLE");
+      }
+    },
+    handleStateChange(state) {
+      this.setSprite(
+        this.spriteByState(state),
+        this.shouldRestartAnimation(state)
+      );
+    },
+    setSprite(sprite, restartAnimation) {
+      this.currentSprite = sprite;
+      if (restartAnimation) this.restartAnimation();
+    },
+    restartAnimation() {
+      this.animate = false;
+      requestAnimationFrame(() => {
+        this.animate = true;
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
 #sprite {
-  background-image: v-bind(backgroundImage);
+  background: transparent v-bind(backgroundImage) no-repeat 0 0;
   width: v-bind(spriteWidth);
   height: v-bind(spriteHeight);
 }
 
 #sprite.run-animation {
-  animation-name: sprite-play;
+  animation-name: sprite-play-position;
   animation-direction: v-bind(direction);
   animation-fill-mode: v-bind(fillMode);
   animation-duration: v-bind(duration);
@@ -151,9 +190,25 @@ export default {
   animation-iteration-count: v-bind(loop);
 }
 
-@keyframes sprite-play {
-  100% {
+@keyframes sprite-play-position {
+  from {
+    background-position: 0;
+  }
+  to {
     background-position: v-bind(endBackgroundPosition);
+  }
+}
+
+/*
+Apparently, animating background-position is intensive
+Ideally should be animating translate but couldn't figure it out yet
+*/
+@keyframes sprite-play-transform {
+  from {
+    transform: translateX(-50%) translateY(-50%) translateX(0px);
+  }
+  to {
+    transform: translateX(-50%) translateY(-50%) translateX(-8100px);
   }
 }
 </style>

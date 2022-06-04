@@ -8,21 +8,49 @@
       @dead="dead"
     ></component>
 
-    <div id="monster-hp-bar">
-      <div id="monster-hp"></div>
-    </div>
+    <DynamicRing
+      id="monster-hp"
+      ref="monster-hp"
+      :side="100"
+      :color="'white'"
+      :opacity="0"
+      :width="5"
+      :arc="{
+        color: 'red',
+        opacity: 1,
+        startPercent: 1,
+        startSpeed: 0,
+      }"
+    />
+
+    <EphemeralText
+      id="hp-alert"
+      ref="hp-alert"
+      :duration="1"
+      :endXPosition="'0px'"
+      :endYPosition="'-12px'"
+      :textTransformer="ephemeralText.textTransformer"
+      :colorTransformer="ephemeralText.colorTransformer"
+    />
 
     <div id="monster-info">
-      <div>{{ monster.name }} (Lv {{ monster.level }})</div>
+      <div id="monster-name">{{ monster.name }}</div>
+      <div id="monster-lvl">{{ monster.level }}</div>
     </div>
   </div>
 </template>
 
 <script>
 import { shallowRef } from "vue";
+import DynamicRing from "../template/dynamic-ring.vue";
+import EphemeralText from "../template/ephemeral-text.vue";
 import Worm from "../sprites/worm.vue";
 export default {
   name: "Monster",
+  components: {
+    DynamicRing,
+    EphemeralText,
+  },
   emits: ["dying", "dead"],
   props: {
     monster: {
@@ -54,6 +82,16 @@ export default {
     hp: 0,
     critical: false,
     sprite: undefined,
+    ephemeralText: {
+      textTransformer: (hp) => {
+        if (hp >= 0) return `+${hp}`;
+        return hp.toString();
+      },
+      colorTransformer: (hp) => {
+        if (hp >= 0) return "green";
+        return "red";
+      },
+    },
   }),
   mounted() {
     this.hp = this.monster.maxHp;
@@ -72,35 +110,44 @@ export default {
         this.isActive
       );
     },
-    hpPercentage() {
-      const pct = (this.hp / this.monster.maxHp) * 100;
-      return `${pct}%`;
+    hpPercentageText() {
+      return `${(this.hp / this.monster.maxHp) * 100}%`;
     },
   },
   methods: {
-    receiveDamage(damage, critical) {
+    receiveDamage(damage, critical, counter) {
       setTimeout(() => {
         this.critical = false;
       }, 100);
       if (critical) this.critical = true;
 
-      this.hp -= damage;
+      this.setHp(this.hp - damage);
       if (this.hp <= 0) {
         this.hp = 0;
         this.setState("DYING");
         this.$emit("dying");
       } else {
-        this.setState("FLINCHING");
+        if (counter) {
+          this.setState("COUNTERED");
+        } else {
+          this.setState("FLINCHING");
+        }
       }
+    },
+    setHp(hp) {
+      const difference = hp - this.hp;
+      const newHp = Math.max(0, Math.min(hp, this.monster.maxHp));
+      this.hp = newHp;
+      this.$refs["monster-hp"].setToPercent(this.hp / this.monster.maxHp, 0.5);
+      this.$refs["hp-alert"].addText(difference);
     },
     dead() {
       this.isActive = false;
       this.$emit("dead");
     },
     setState(state) {
-      // don't flinch when attacking
+      // don't flinch when attacking, unless state is "COUNTERED"
       if (state === "FLINCHING" && this.state === "ATTACKING") return;
-
       if (this.state !== state) this.state = state;
     },
   },
@@ -119,24 +166,33 @@ export default {
   animation: image-shake 100ms linear infinite;
 }
 
-#monster-hp-bar {
-  position: absolute;
-  width: 100%;
-  height: 10px;
-  top: 0;
-  background-color: gainsboro;
-}
-
 #monster-info {
   position: absolute;
-  top: 12px;
-  left: 10px;
+  top: 7%;
+  left: 7%;
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+}
+
+#monster-lvl {
+  font-size: 30px;
+  font-weight: 777;
 }
 
 #monster-hp {
-  background-color: rgba(255, 0, 0, 0.8);
-  width: v-bind(hpPercentage);
-  height: 100%;
+  position: absolute;
+  top: 7%;
+  left: 7%;
+  transform: translateX(-50%) translateY(-50%);
+  transform-origin: 50% 50%;
+}
+
+#hp-alert {
+  position: absolute;
+  top: 3%;
+  left: 12%;
+  transform: translateX(-50%) translateY(-50%);
+  transform-origin: 50% 50%;
 }
 
 @keyframes image-shake {

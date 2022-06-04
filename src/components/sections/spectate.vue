@@ -28,7 +28,7 @@ div {
   justify-content: center;
   align-items: center;
   user-select: none;
-  left: 15px;
-  bottom: 40px;
+  left: 35px;
+  bottom: 150px;
 }
 </style>

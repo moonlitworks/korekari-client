@@ -15,13 +15,11 @@ export default {
   }),
   methods: {
     addCombo() {
+      this.shrink = false;
       this.combo += 1;
       clearTimeout(this.gradePeriod);
       requestAnimationFrame(() => {
-        this.shrink = false;
-        requestAnimationFrame(() => {
-          this.shrink = true;
-        });
+        this.shrink = true;
       });
       this.gradePeriod = setTimeout(() => {
         this.resetCombo();
@@ -39,8 +37,10 @@ export default {
 <style scoped>
 #container {
   position: absolute;
-  left: 20%;
-  top: 20%;
+  left: 50%;
+  top: 50%;
+  transform-origin: 50% 50%;
+  transform: translateX(-300px) translateY(-300px);
   text-align: center;
   width: 200px;
 }

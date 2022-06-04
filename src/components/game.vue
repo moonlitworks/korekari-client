@@ -41,14 +41,14 @@
 </template>
 
 <script>
-import Ring from "./game-components/ring.vue";
-import Player from "./game-components/player.vue";
-import Monster from "./game-components/monster.vue";
-import Combo from "./game-components/combo.vue";
-import Spectate from "./game-components/spectate.vue";
-import GameOver from "./game-components/game-over.vue";
-import Interaction from "./game-components/interaction.vue";
-import Server from "./game-components/server.vue";
+import Ring from "./sections/ring.vue";
+import Player from "./sections/player.vue";
+import Monster from "./sections/monster.vue";
+import Combo from "./sections/combo.vue";
+import Spectate from "./sections/spectate.vue";
+import GameOver from "./sections/game-over.vue";
+import Interaction from "./sections/interaction.vue";
+import Server from "./sections/server.vue";
 
 export default {
   name: "KoreKari",
@@ -103,31 +103,34 @@ export default {
   },
   methods: {
     restartGame() {
-      this.gameOver = false;
-      this.isSpectateMode = false;
-      this.playerObject = {
-        name: "Hunter",
-        exp: 0,
-        level: 1,
-        maxHp: 100,
-        items: [
-          {
-            id: "STICK",
-            type: "WEAPON",
-            name: "Stick",
-            element: "Neutral",
-            damage: 1,
-          },
-        ],
-      };
-      this.server.spawnMonster(1, 0);
-      this.interactionEl.focus();
+      this.monsterObject = undefined;
+      this.playerObject = undefined;
+
+      requestAnimationFrame(() => {
+        this.gameOver = false;
+        this.isSpectateMode = true;
+        this.playerObject = {
+          name: "Hunter",
+          exp: 0,
+          level: 1,
+          maxHp: 100,
+          items: [
+            {
+              id: "STICK",
+              type: "WEAPON",
+              name: "Stick",
+              element: "Neutral",
+              damage: 1,
+            },
+          ],
+        };
+        this.server.spawnMonster(1, 0);
+        this.interactionEl.focus();
+      });
     },
     setGameOver() {
       this.toggleSpectateMode(true);
       this.gameOver = true;
-      this.playerObject = undefined;
-      this.monsterObject = undefined;
     },
     registerCombo(value) {
       if (value > this.highestCombo) this.highestCombo = value;
@@ -232,7 +235,7 @@ export default {
             }
           } else if (hit.type === "DEFEND" && hit.hitType === "BONUS") {
             console.log("Counter!");
-            this.monster?.receiveDamage(this.calcCounter());
+            this.monster?.receiveDamage(this.calcCounter(), true, true);
           }
 
           this.combo?.addCombo();
