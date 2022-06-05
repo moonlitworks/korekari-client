@@ -8,34 +8,36 @@
       @dead="dead"
     ></component>
 
-    <DynamicRing
-      id="monster-hp"
-      ref="monster-hp"
-      :side="100"
-      :color="'white'"
-      :opacity="0"
-      :width="5"
-      :arc="{
-        color: 'red',
-        opacity: 1,
-        startPercent: 1,
-        startSpeed: 0,
-      }"
-    />
+    <div id="monster-container">
+      <DynamicRing
+        id="monster-hp"
+        ref="monster-hp"
+        :side="100"
+        :color="'white'"
+        :opacity="0"
+        :width="5"
+        :arc="{
+          color: 'red',
+          opacity: 1,
+          startPercent: 1,
+          startSpeed: 0,
+        }"
+      />
 
-    <EphemeralText
-      id="hp-alert"
-      ref="hp-alert"
-      :duration="0.5"
-      :endXPosition="'0px'"
-      :endYPosition="'-20px'"
-      :textTransformer="ephemeralText.textTransformer"
-      :colorTransformer="ephemeralText.colorTransformer"
-    />
+      <EphemeralText
+        id="hp-alert"
+        ref="hp-alert"
+        :duration="0.5"
+        :endXPosition="'0px'"
+        :endYPosition="'-20px'"
+        :textTransformer="ephemeralText.textTransformer"
+        :colorTransformer="ephemeralText.colorTransformer"
+      />
 
-    <div id="monster-info">
-      <div id="monster-name">{{ monster.name }}</div>
-      <div id="monster-lvl">{{ monster.level }}</div>
+      <div id="monster-info">
+        <div id="monster-name">{{ monster.name }}</div>
+        <div id="monster-lvl">{{ monster.level }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -94,10 +96,11 @@ export default {
     },
   }),
   mounted() {
-    this.hp = this.monster.maxHp;
+    this.hp = this.monster.hp ?? this.monster.maxHp;
     this.state = "IDLE";
     this.critical = false;
     this.sprite = shallowRef(Worm);
+    this.$refs["monster-hp"].setToPercent(this.hp / this.monster.maxHp, 0.5);
 
     setTimeout(() => {
       this.isActive = true;
@@ -166,11 +169,18 @@ export default {
   animation: image-shake 100ms linear infinite;
 }
 
+#monster-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 70px;
+  top: 70px;
+  transform-origin: 50% 50%;
+}
+
 #monster-info {
   position: absolute;
-  top: 7%;
-  left: 7%;
-  transform: translateX(-50%) translateY(-50%);
   text-align: center;
 }
 
@@ -181,18 +191,12 @@ export default {
 
 #monster-hp {
   position: absolute;
-  top: 7%;
-  left: 7%;
-  transform: translateX(-50%) translateY(-50%);
-  transform-origin: 50% 50%;
 }
 
 #hp-alert {
   position: absolute;
-  top: 3%;
-  left: 12%;
-  transform: translateX(-50%) translateY(-50%);
-  transform-origin: 50% 50%;
+  bottom: 30px;
+  left: 60px;
 }
 
 @keyframes image-shake {

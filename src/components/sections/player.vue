@@ -1,34 +1,42 @@
 <template>
   <div>
-    <div id="feedback" :class="{ hurt: hurt }"></div>
+    <div id="feedback" ref="feedback" :class="{ hurt: hurt }"></div>
 
-    <DynamicRing
-      id="player-hp"
-      ref="player-hp"
-      :side="100"
-      :color="'white'"
-      :opacity="0"
-      :width="5"
-      :arc="{
-        color: 'red',
-        opacity: 1,
-        startPercent: 1,
-        startSpeed: 0,
-      }"
-    />
+    <div id="player-container">
+      <DynamicRing
+        id="player-hp"
+        ref="player-hp"
+        :side="100"
+        :color="'white'"
+        :opacity="0"
+        :width="5"
+        :arc="{
+          color: 'red',
+          opacity: 1,
+          startPercent: 1,
+          startSpeed: 0,
+        }"
+      />
 
-    <EphemeralText
-      id="hp-alert"
-      ref="hp-alert"
-      :duration="0.5"
-      :endXPosition="'0px'"
-      :endYPosition="'-20px'"
-      :textTransformer="ephemeralText.textTransformer"
-      :colorTransformer="ephemeralText.colorTransformer"
-    />
+      <EphemeralText
+        id="hp-alert"
+        ref="hp-alert"
+        :duration="0.5"
+        :endXPosition="'0px'"
+        :endYPosition="'-20px'"
+        :textTransformer="ephemeralText.textTransformer"
+        :colorTransformer="ephemeralText.colorTransformer"
+      />
 
-    <div id="player-info">
-      <div>{{ player.name }}</div>
+      <Inventory
+        id="player-inventory"
+        :armor="player.armor"
+        :weapon="player.weapon"
+      />
+
+      <div id="player-info">
+        <div>{{ player.name }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,11 +44,13 @@
 <script>
 import DynamicRing from "../template/dynamic-ring.vue";
 import EphemeralText from "../template/ephemeral-text.vue";
+import Inventory from "./inventory.vue";
 export default {
   name: "Player",
   components: {
     DynamicRing,
     EphemeralText,
+    Inventory,
   },
   emits: ["gameOver"],
   props: {
@@ -93,10 +103,10 @@ export default {
       this.showHurt();
     },
     showHurt() {
-      setTimeout(() => {
-        this.hurt = false;
-      }, 500);
-      this.hurt = true;
+      this.hurt = false;
+      requestAnimationFrame(() => {
+        this.hurt = true;
+      });
     },
     heal(value) {
       this.setHp(this.hp + value);
@@ -106,6 +116,16 @@ export default {
 </script>
 
 <style scoped>
+#player-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 70px;
+  bottom: 70px;
+  transform-origin: 50% 50%;
+}
+
 #feedback {
   position: absolute;
   z-index: 10;
@@ -116,7 +136,7 @@ export default {
 #feedback.hurt {
   opacity: 1;
   background-color: rgba(255, 99, 71, 0.5);
-  animation: hurt-animation 0.5s ease forwards;
+  animation: hurt-animation 0.5s ease forwards 1;
 }
 
 @keyframes hurt-animation {
@@ -130,28 +150,21 @@ export default {
 
 #player-info {
   position: absolute;
-  bottom: 12px;
-  left: 10px;
-  position: absolute;
-  bottom: 7%;
-  left: 7%;
-  transform: translateX(-50%) translateY(50%);
-  transform-origin: 50% 50%;
 }
 
 #player-hp {
   position: absolute;
-  bottom: 7%;
-  left: 7%;
-  transform: translateX(-50%) translateY(50%);
-  transform-origin: 50% 50%;
+}
+
+#player-inventory {
+  position: absolute;
+  display: flex;
+  left: 100px;
 }
 
 #hp-alert {
   position: absolute;
-  bottom: 10%;
-  left: 12%;
-  transform: translateX(-50%) translateY(-50%);
-  transform-origin: 50% 50%;
+  bottom: 30px;
+  left: 60px;
 }
 </style>

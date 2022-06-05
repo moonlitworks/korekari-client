@@ -2,7 +2,7 @@
   <div id="game-over-screen">
     <div id="container">
       <h1>Game Over</h1>
-      <button @click.left.prevent="restart">Restart</button>
+      <button @click.left.prevent="restart">Rejoin</button>
     </div>
   </div>
 </template>

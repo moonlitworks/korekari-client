@@ -27,7 +27,6 @@
       :showCenter="showCenter"
       @missedTarget="missedTarget"
     />
-    <Inventory :armor="playerObject?.armor" :weapon="playerObject?.weapon" />
     <Combo ref="combo" @lastCombo="registerCombo" />
     <Interaction ref="interaction" @interaction="interaction" />
     <Spectate
@@ -53,7 +52,6 @@
 import Ring from "./sections/ring.vue";
 import Player from "./sections/player.vue";
 import Monster from "./sections/monster.vue";
-import Inventory from "./sections/inventory.vue";
 import Combo from "./sections/combo.vue";
 import Spectate from "./sections/spectate.vue";
 import GameOver from "./sections/game-over.vue";
@@ -66,7 +64,6 @@ export default {
     Ring,
     Player,
     Monster,
-    Inventory,
     Combo,
     Spectate,
     GameOver,
@@ -122,6 +119,8 @@ export default {
       requestAnimationFrame(() => cb());
     },
     setGameOver() {
+      this.combo?.resetCombo();
+      this.isSpectateMode = true;
       this.gameOver = true;
     },
     registerCombo(value) {
@@ -152,9 +151,8 @@ export default {
       this.interactionEl.focus();
     },
     addTarget(data) {
-      if (!this.monsterObject) return;
-      if (data.type === "DEFEND") this.monster.setState("ATTACKING");
-      if (this.isSpectateMode) return;
+      if (data.type === "DEFEND") this.monster?.setState("ATTACKING");
+      if (!this.monsterObject || this.isSpectateMode) return;
       const lifetime = data.expiry - new Date();
       const angle = Math.floor(Math.random() * 361);
       const color = ((type) => {
@@ -196,6 +194,8 @@ export default {
         this.playerObject = player;
         this.monsterObject = monster;
         this.gameOver = false;
+        this.isSpectateMode = false;
+        this.interactionEl.focus();
       });
     },
     setMonster(monsterObject) {

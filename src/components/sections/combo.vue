@@ -1,5 +1,5 @@
 <template>
-  <div v-if="combo > 0" id="container">
+  <div v-show="combo > 0" id="container">
     <div id="counter">Combo {{ combo }}</div>
     <div id="timer" ref="timer" :class="{ shrink: shrink }"></div>
   </div>
@@ -11,19 +11,19 @@ export default {
   data: () => ({
     combo: 0,
     shrink: false,
-    gradePeriod: undefined,
   }),
+  mounted() {
+    this.$refs["timer"].addEventListener("animationend", () => {
+      this.resetCombo();
+    });
+  },
   methods: {
     addCombo() {
       this.shrink = false;
-      this.combo += 1;
-      clearTimeout(this.gradePeriod);
       requestAnimationFrame(() => {
         this.shrink = true;
+        this.combo += 1;
       });
-      this.gradePeriod = setTimeout(() => {
-        this.resetCombo();
-      }, 5000);
     },
     resetCombo() {
       this.$emit("lastCombo", this.combo);

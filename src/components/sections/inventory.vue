@@ -37,10 +37,6 @@ export default {
 
 <style>
 #inventory {
-  position: absolute;
-  bottom: 1.5%;
-  left: 160px;
-  display: flex;
   width: 210px;
 }
 

@@ -1,4 +1,5 @@
 <template>
+  <div id="instructions">Controls: Left Mouse Button or Spacebar</div>
   <div
     id="interaction-screen"
     ref="interaction-screen"
@@ -32,5 +33,12 @@ export default {
   height: 100%;
   z-index: 10;
   user-select: none;
+}
+
+#instructions {
+  color: rgb(160, 156, 156);
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
 }
 </style>

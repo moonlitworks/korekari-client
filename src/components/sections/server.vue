@@ -141,19 +141,25 @@ export default {
           const type = Math.random() < 0.6 ? "WEAPON" : "ARMOR";
           const strength = rare ? hit.strength.rare : hit.strength.normal;
           const name = type === "WEAPON" ? "Dragorm's Tooth" : "Dragorm's Hide";
-          const description = `${type} from ${this.currentMonster.name}`;
+          const description = `${type} from ${
+            this.currentMonster?.name ?? "Dragorm"
+          }`;
           const item = {
             type,
             id: uuid.v4(),
-            element: this.currentMonster.element,
+            element: this.currentMonster?.element ?? "FIRE",
             strength,
             name,
             description,
           };
+          // TODO: fix issue where ITEM target is hit after monster
+          // is defeated causing `this.currenctMonster` to be undefined
+          // and .name/.element properties fail but needed to generate
+          // this item. Maybe pass on target creation? cache?
           this.receive("item:get", item);
         }
 
-        if (this.isMonsterAlive) this.checkMonsterHealth();
+        this.checkMonsterHealth();
       }
 
       if (data.type === "target:miss") {
@@ -261,10 +267,9 @@ export default {
       this.receive("target:add", target);
     },
     checkMonsterHealth() {
-      if (!this.isMonsterAlive || !this.currentMonster?.level) return;
+      if (this.isMonsterAlive || !this.currentMonster?.level) return;
       this.healPlayer(20);
-
-      const lastLevel = this.currentMonster?.level;
+      const lastLevel = this.currentMonster.level;
       this.currentMonster = undefined;
       setTimeout(() => {
         this.generateMonster(lastLevel + 1);
