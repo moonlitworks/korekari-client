@@ -11,3 +11,5 @@ export const calculateY = (angle, offset) => {
 export const isLargeArc = (start, end) => Math.abs((end - start) % 360) > 180
 
 export const toObject = x => JSON.parse(JSON.stringify(x))
+
+export const randomBetween = (min, max) => Math.round(Math.random() * (max - min)) + min;

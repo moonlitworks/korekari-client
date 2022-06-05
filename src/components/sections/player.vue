@@ -48,15 +48,8 @@ export default {
       name: String,
       level: Number,
       maxHp: Number,
-      items: [
-        {
-          id: String,
-          type: String,
-          name: String,
-          element: String,
-          damage: Number,
-        },
-      ],
+      weapon: undefined,
+      armor: undefined,
     },
   },
   data: () => ({

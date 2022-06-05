@@ -1,5 +1,6 @@
 <template>
   <svg id="ring-box" ref="ring-box">
+    <circle v-if="showCenter" id="centerpoint" cy="50%" cx="50%" r="5" />
     <circle id="ring-backdrop" />
     <circle id="ring" ref="ring" />
     <g id="targets">
@@ -19,7 +20,7 @@
         :bonusEnd="target.bonusEnd"
         :lifetime="target.lifetime"
         :hits="target.hits"
-        :target="target"
+        :strength="target.strength"
         @remove="removeTarget"
         @missed="missedTarget"
       />
@@ -53,9 +54,7 @@ export default {
   props: {
     thickness: Number,
     speed: String,
-    ringColor: String, // unused
-    ringOpacity: Number, // unused
-    pointerColor: String, // unused
+    showCenter: Boolean,
   },
   data: () => ({
     targetList: [],
@@ -99,7 +98,7 @@ export default {
     },
   },
   methods: {
-    addTarget(id, type, angle, color, size, bonus, lifetime, hits) {
+    addTarget(rawData, id, type, angle, color, size, bonus, lifetime, hits) {
       this.targetList.push({
         id: id ?? uuid.v4(),
         type,
@@ -111,6 +110,7 @@ export default {
         end: angle + size,
         bonusStart: bonus ? angle - bonus : undefined,
         bonusEnd: bonus ? angle + bonus : undefined,
+        strength: rawData.strength,
       });
     },
     missedTarget(target) {

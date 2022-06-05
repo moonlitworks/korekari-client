@@ -11,6 +11,7 @@ import Arc from "./arc.vue";
 import Sword from "../icons/sword.vue";
 import Heart from "../icons/heart.vue";
 import Shield from "../icons/shield.vue";
+import Item from "../icons/item.vue";
 export default {
   name: "Target",
   components: {
@@ -29,6 +30,10 @@ export default {
     bonusEnd: Number,
     lifetime: Number,
     hits: Number,
+    strength: {
+      normal: Number,
+      rare: Number,
+    },
   },
   data: () => ({
     active: true,
@@ -46,6 +51,8 @@ export default {
         case "ATTACK":
         case "SKILL":
           return Sword;
+        case "ITEM":
+          return Item;
         default:
           return undefined;
       }
@@ -157,6 +164,7 @@ export default {
         bonusEnd: this.bonusEnd,
         lifetime: this.lifetime,
         hits: this.hits,
+        strength: this.strength,
       };
     },
   },

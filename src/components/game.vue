@@ -24,8 +24,10 @@
       :ringColor="'black'"
       :ringOpacity="0.1"
       :pointerColor="'red'"
+      :showCenter="showCenter"
       @missedTarget="missedTarget"
     />
+    <Inventory :armor="playerObject?.armor" :weapon="playerObject?.weapon" />
     <Combo ref="combo" @lastCombo="registerCombo" />
     <Interaction ref="interaction" @interaction="interaction" />
     <Spectate
@@ -42,6 +44,7 @@
       @playerDealt="playerDealt"
       @playerHp="playerHp"
       @addTarget="addTarget"
+      @getItem="getItem"
     />
   </div>
 </template>
@@ -50,6 +53,7 @@
 import Ring from "./sections/ring.vue";
 import Player from "./sections/player.vue";
 import Monster from "./sections/monster.vue";
+import Inventory from "./sections/inventory.vue";
 import Combo from "./sections/combo.vue";
 import Spectate from "./sections/spectate.vue";
 import GameOver from "./sections/game-over.vue";
@@ -62,6 +66,7 @@ export default {
     Ring,
     Player,
     Monster,
+    Inventory,
     Combo,
     Spectate,
     GameOver,
@@ -69,6 +74,7 @@ export default {
     Server,
   },
   data: () => ({
+    showCenter: false,
     highestCombo: 0,
     gameOver: false,
     isSpectateMode: false,
@@ -146,6 +152,7 @@ export default {
       this.interactionEl.focus();
     },
     addTarget(data) {
+      if (!this.monsterObject) return;
       if (data.type === "DEFEND") this.monster.setState("ATTACKING");
       if (this.isSpectateMode) return;
       const lifetime = data.expiry - new Date();
@@ -158,12 +165,15 @@ export default {
             return "green";
           case "SKILL":
             return "orange";
+          case "ITEM":
+            return "purple";
           case "ATTACK":
           default:
             return "red";
         }
       })(data.type);
       this.ring.addTarget(
+        data,
         data.id,
         data.type,
         angle,
@@ -176,11 +186,8 @@ export default {
     },
     missedTarget(target) {
       if (this.isSpectateMode) return;
-      if ([undefined, "DEAD", "DYING"].includes(this.monster.state)) return;
-      this.server.send({
-        type: "target:miss",
-        target,
-      });
+      if ([undefined, "DEAD", "DYING"].includes(this.monster?.state)) return;
+      this.server.send({ type: "target:miss", target });
     },
     initGame({ player, monster }) {
       this.playerObject = undefined;
@@ -203,6 +210,14 @@ export default {
     playerHp(newHp) {
       this.player?.setHp(newHp);
     },
+    getItem(item) {
+      if (item.type === "WEAPON") {
+        this.playerObject.weapon = item;
+      }
+      if (item.type === "ARMOR") {
+        this.playerObject.armor = item;
+      }
+    },
     monsterDying() {
       this.ring.targetList.forEach((x) => {
         switch (x.type) {
@@ -215,29 +230,8 @@ export default {
       });
     },
     monsterDead() {
-      const nextLevelRaw =
-        2 * Math.floor(this.playerObject.level / this.monsterObject.level);
-      const nextLevelUp = nextLevelRaw > 1 ? nextLevelRaw : 1;
-      const nextLevel = this.monsterObject.level + nextLevelUp;
-
-      const exp =
-        3 *
-        this.highestCombo *
-        (this.monsterObject.level / this.playerObject.level);
-      this.rewardPlayer(exp, 50);
       this.highestCombo = 0;
-
-      setTimeout(() => {
-        this.monsterObject = undefined;
-        this.server.send({
-          type: "monster:fetch",
-          level: nextLevel,
-          delay: 2000,
-        });
-      }, 1000);
-    },
-    rewardPlayer(exp, heal) {
-      this.player.heal(heal);
+      this.monsterObject = undefined;
     },
   },
 };

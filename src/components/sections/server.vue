@@ -4,6 +4,8 @@
 
 <script>
 import { uuid } from "vue-uuid";
+import { normalPlayerDamage, normalMonsterDamage } from "../managers/dynamics";
+import { randomBetween } from "../../utils";
 export default {
   name: "Server",
   props: {
@@ -12,41 +14,23 @@ export default {
   data: () => ({
     connectionStatus: "MOCKED",
     isClientReady: false,
+    isMissDisabled: false,
     currentPlayers: [],
     currentPlayer: undefined,
-    currentMonster: {
-      id: uuid.v4(),
-      name: "Dragorm",
-      level: 1,
-      hp: 100,
-      maxHp: 100,
-      element: "FIRE",
-      hitConfig: {
-        normalWidth: 50,
-        criticalWidth: 35,
-        normalDamage: 1,
-        criticalDamage: 10,
-        normalAttack: 1,
-      },
-      skills: [
-        {
-          id: "FIRE_BREATH",
-          name: "Fire Breath",
-          element: "FIRE",
-          damage: 10,
-          dodgeWidth: 40,
-        },
-      ],
-    },
+    currentMonster: undefined,
   }),
   computed: {
     isMocked() {
       return this.connectionStatus === "MOCKED";
     },
+    isMonsterAlive() {
+      return this.currentMonster?.hp > 0;
+    },
   },
   mounted() {
+    this.generateMonster(1);
     setInterval(() => {
-      if (!this.isClientReady || this.currentMonster.hp <= 0) return;
+      if (!this.isClientReady || !this.isMonsterAlive) return;
       this.generateMonsterEvent();
     }, 1000);
   },
@@ -73,19 +57,27 @@ export default {
       }
 
       if (data.type === "player:miss") {
-        this.currentPlayer.hp -= 3;
-        this.receive("player:damage", {
-          value: 3,
-        });
+        if (this.isMonsterAlive) {
+          this.currentPlayer.hp -= 3;
+          this.receive("player:damage", {
+            value: 3,
+          });
+        }
       }
 
       if (data.type === "target:hit") {
         const hit = data.hit;
         if (hit.type === "ATTACK") {
-          const damage = hit.hitType === "BONUS" ? 10 : 1;
-          this.currentMonster.hp -= damage;
+          if (!this.isMonsterAlive) return;
+          const rawDamage = normalPlayerDamage(
+            this.currentMonster,
+            this.currentPlayer
+          );
+          const bonusMultiplier = hit.hitType === "BONUS" ? 10 : 1;
+          const totalDamage = rawDamage * bonusMultiplier;
+          this.currentMonster.hp -= totalDamage;
           this.receive("player:dealt", {
-            value: damage,
+            value: totalDamage,
             isCritical: hit.hitType === "BONUS",
             isCounter: false,
           });
@@ -97,10 +89,16 @@ export default {
         }
 
         if (hit.type === "SKILL") {
-          const damage = hit.hitType === "BONUS" ? 50 : 10;
-          this.currentMonster.hp -= damage;
+          if (!this.isMonsterAlive) return;
+          const rawDamage = normalPlayerDamage(
+            this.currentMonster,
+            this.currentPlayer
+          );
+          const bonusMultiplier = hit.hitType === "BONUS" ? 50 : 10;
+          const totalDamage = rawDamage * bonusMultiplier;
+          this.currentMonster.hp -= totalDamage;
           this.receive("player:dealt", {
-            value: damage,
+            value: totalDamage,
             isCritical: hit.hitType === "BONUS",
             isCounter: false,
           });
@@ -112,11 +110,16 @@ export default {
         }
 
         if (hit.type === "DEFEND") {
-          const damage = hit.hitType === "BONUS" ? 5 : 0;
-          if (damage > 0) {
-            this.currentMonster.hp -= damage;
+          if (hit.hitType !== "BONUS" || !this.isMonsterAlive) return;
+          const rawDamage = normalPlayerDamage(
+            this.currentMonster,
+            this.currentPlayer
+          );
+          const totalDamage = rawDamage * 5;
+          if (totalDamage > 0) {
+            this.currentMonster.hp -= totalDamage;
             this.receive("player:dealt", {
-              value: damage,
+              value: totalDamage,
               isCritical: true,
               isCounter: true,
             });
@@ -130,20 +133,38 @@ export default {
 
         if (hit.type === "HEAL") {
           const heal = hit.hitType === "BONUS" ? 50 : 10;
-          const newHp = Math.max(
-            0,
-            Math.min(this.currentPlayer.hp + heal, this.currentPlayer.maxHp)
-          );
-          this.currentPlayer.hp = newHp;
-          this.receive("player:hp", { value: newHp });
+          this.healPlayer(heal);
         }
+
+        if (hit.type === "ITEM") {
+          const rare = hit.hitType === "BONUS";
+          const type = Math.random() < 0.6 ? "WEAPON" : "ARMOR";
+          const strength = rare ? hit.strength.rare : hit.strength.normal;
+          const name = type === "WEAPON" ? "Dragorm's Tooth" : "Dragorm's Hide";
+          const description = `${type} from ${this.currentMonster.name}`;
+          const item = {
+            type,
+            id: uuid.v4(),
+            element: this.currentMonster.element,
+            strength,
+            name,
+            description,
+          };
+          this.receive("item:get", item);
+        }
+
+        if (this.isMonsterAlive) this.checkMonsterHealth();
       }
 
       if (data.type === "target:miss") {
-        if (data.target.type === "DEFEND") {
-          this.currentPlayer.hp -= 5;
+        if (data.target.type === "DEFEND" && !this.isMissDisabled) {
+          const damage = normalMonsterDamage(
+            this.currentMonster,
+            this.currentPlayer
+          );
+          this.currentPlayer.hp -= damage;
           this.receive("player:damage", {
-            value: 5,
+            value: damage,
           });
         }
       }
@@ -170,76 +191,92 @@ export default {
         if (this.currentPlayer.id !== playerId) return;
         this.$emit("addTarget", targetData);
       }
+
+      if (event === "item:get") {
+        this.$emit("getItem", data);
+      }
     },
 
-    addTargetIfEmpty() {
-      const canAdd = this.gm.ring.activeTargets.length < 4;
-      if (!this.gm.monsterIsAlive || !canAdd) return;
-
-      const angle = Math.floor(Math.random() * 361);
-      const hits = 1;
-      const type =
-        Math.random() < 0.8
-          ? "ATTACK"
-          : Math.random() < 0.8
-          ? "DEFEND"
-          : Math.random() < 0.8
-          ? "HEAL"
-          : "SKILL";
-      const color = (() => {
-        switch (type) {
-          case "DEFEND":
-            return "green";
-          case "HEAL":
-            return "gold";
-          case "SKILL":
-            return "blue";
-          case "ATTACK":
-          default:
-            return "red";
-        }
-      })();
-      this.$emit("addTarget", { angle, hits, type, color });
-    },
     generateNewPlayer(data) {
       return {
         id: uuid.v4(),
         name: data.name ?? "Random",
         hp: 100,
         maxHp: 100,
-        items: [
+        weapon: undefined,
+        armor: undefined,
+      };
+    },
+    generateMonster(level) {
+      this.currentMonster = {
+        id: uuid.v4(),
+        name: "Dragorm",
+        level,
+        hp: 100,
+        maxHp: 100,
+        element: "FIRE",
+        hitConfig: {
+          normalWidth: 50,
+          criticalWidth: 35,
+          normalDamage: 1,
+          criticalDamage: 10,
+          normalAttack: 1,
+        },
+        skills: [
           {
-            id: "STICK",
-            type: "WEAPON",
-            name: "Stick",
-            element: "Neutral",
-            damage: 1,
+            id: "FIRE_BREATH",
+            name: "Fire Breath",
+            element: "FIRE",
+            damage: 10,
+            dodgeWidth: 40,
           },
         ],
       };
+      this.$emit("setMonster", this.currentMonster);
     },
     generateMonsterEvent() {
       const now = new Date();
-
-      const type =
-        Math.random() < 0.8
-          ? "ATTACK"
-          : Math.random() < 0.8
-          ? "DEFEND"
-          : Math.random() < 0.8
-          ? "HEAL"
-          : "SKILL";
+      const type = ((num) => {
+        if (num < 0.5) return "ATTACK";
+        if (num < 0.75) return "DEFEND";
+        if (num < 0.875) return "DEFEND";
+        if (num < 0.9375) return "HEAL";
+        if (num < 0.96875) return "SKILL";
+        return "ITEM";
+      })(Math.random());
 
       const target = {
         id: uuid.v4(),
         type,
         expiry: now.setSeconds(now.getSeconds() + 3),
         playerId: this.currentPlayer.id,
-        bonus: 2,
+        bonus: 1,
         size: 10,
+        strength: {
+          rare: this.currentMonster.level + randomBetween(4, 10),
+          normal: this.currentMonster.level + randomBetween(1, 4),
+        },
       };
 
       this.receive("target:add", target);
+    },
+    checkMonsterHealth() {
+      if (!this.isMonsterAlive || !this.currentMonster?.level) return;
+      this.healPlayer(20);
+
+      const lastLevel = this.currentMonster?.level;
+      this.currentMonster = undefined;
+      setTimeout(() => {
+        this.generateMonster(lastLevel + 1);
+      }, 2000);
+    },
+    healPlayer(amount) {
+      const newHp = Math.max(
+        0,
+        Math.min(this.currentPlayer.hp + amount, this.currentPlayer.maxHp)
+      );
+      this.currentPlayer.hp = newHp;
+      this.receive("player:hp", { value: newHp });
     },
   },
 };
