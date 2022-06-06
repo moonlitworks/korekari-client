@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/moonlitworks/korekari-client/compare/v1.0.1...v1.1.0) (2022-06-06)
+
+
+### Features
+
+* **vue:** add pwa ([00bf1a9](https://github.com/moonlitworks/korekari-client/commit/00bf1a9fbeb32703a8c349d63793dcee99e5a49b))
+
 ### [1.0.1](https://github.com/moonlitworks/korekari-client/compare/v1.0.0...v1.0.1) (2022-06-06)
 
 ## [1.0.0](https://github.com/moonlitworks/korekari-client/compare/v0.2.13...v1.0.0) (2022-06-05)
