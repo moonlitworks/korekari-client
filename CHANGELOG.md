@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/moonlitworks/korekari-client/compare/v1.0.0...v1.0.1) (2022-06-06)
+
 ## [1.0.0](https://github.com/moonlitworks/korekari-client/compare/v0.2.13...v1.0.0) (2022-06-05)
 
 ### [0.2.13](https://github.com/moonlitworks/korekari-client/compare/v0.2.12...v0.2.13) (2022-06-05)
