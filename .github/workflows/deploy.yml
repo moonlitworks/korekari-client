@@ -11,6 +11,10 @@ jobs:
     runs-on: self-hosted
     if: "!contains(github.event.head_commit.message, 'chore(release)')"
     steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        with:
+          fetch-depth: 0
       - name: Import GPG Key
         uses: crazy-max/ghaction-import-gpg@v4
         id: import_gpg
@@ -43,6 +47,14 @@ jobs:
         name: Checkout
         with:
           fetch-depth: 0
+      - uses: borales/actions-yarn@v2.3.0
+        name: Install dependencies
+        with:
+          cmd: install
+      - uses: borales/actions-yarn@v2.3.0
+        name: Build dist
+        with:
+          cmd: build
       - name: Get version
         id: version
         run: |
