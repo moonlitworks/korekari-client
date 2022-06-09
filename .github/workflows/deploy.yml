@@ -6,15 +6,24 @@ on:
       - main
 
 jobs:
-  version:
-    name: Version bump
+  setup:
+    name: Setup Node
     runs-on: self-hosted
-    if: "!contains(github.event.head_commit.message, 'chore(release)')"
     steps:
       - uses: actions/checkout@v2
         name: Checkout
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+  version:
+    name: Version bump
+    runs-on: self-hosted
+    needs: [setup]
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    steps:
       - name: Import GPG Key
         uses: crazy-max/ghaction-import-gpg@v4
         id: import_gpg
@@ -36,6 +45,7 @@ jobs:
   staging:
     name: Deploy to staging
     runs-on: self-hosted
+    needs: [setup]
     if: "contains(github.event.head_commit.message, 'chore(release)')"
     environment:
       name: staging
@@ -43,10 +53,6 @@ jobs:
     outputs:
       semver: ${{ steps.version.outputs.semver }}
     steps:
-      - uses: actions/checkout@v2
-        name: Checkout
-        with:
-          fetch-depth: 0
       - name: Get version
         id: version
         run: |
