@@ -81,6 +81,7 @@ export default {
     highestCombo: 0,
     gameOver: false,
     isSpectateMode: false,
+    acceptingTargets: false,
     monsterObject: undefined,
     playerObject: undefined,
   }),
@@ -128,6 +129,8 @@ export default {
       this.combo?.resetCombo();
       this.isSpectateMode = true;
       this.gameOver = true;
+      this.acceptingTargets = false;
+      this.ring.targetList.forEach((x) => this.ring.fadeTarget(x.id, true));
     },
     registerCombo(value) {
       if (value > this.highestCombo) this.highestCombo = value;
@@ -158,7 +161,8 @@ export default {
     },
     addTarget(data) {
       if (data.type === "DEFEND") this.monster?.setState("ATTACKING");
-      if (!this.monsterObject || this.isSpectateMode) return;
+      if (!this.monsterObject || this.isSpectateMode || !this.acceptingTargets)
+        return;
       const lifetime = data.expiry - new Date();
       const angle = Math.floor(Math.random() * 361);
       const color = ((type) => {
@@ -199,9 +203,12 @@ export default {
       this.restartAnimation(() => {
         this.playerObject = player;
         this.monsterObject = monster;
+        this.interactionEl.focus();
         this.gameOver = false;
         this.isSpectateMode = false;
-        this.interactionEl.focus();
+        setTimeout(() => {
+          this.acceptingTargets = true;
+        }, 2000);
       });
     },
     setMonster(monsterObject) {
