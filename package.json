@@ -1,6 +1,6 @@
 {
   "name": "korekari-client",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "scripts": {
     "serve": "npx vue-cli-service serve",
