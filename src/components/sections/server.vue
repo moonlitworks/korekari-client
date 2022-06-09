@@ -7,7 +7,7 @@ import { uuid } from "vue-uuid";
 import { normalPlayerDamage, normalMonsterDamage } from "../managers/dynamics";
 import { randomBetween } from "../../utils";
 export default {
-  name: "Server",
+  name: "ServerSection",
   props: {
     gm: undefined,
   },
@@ -58,9 +58,13 @@ export default {
 
       if (data.type === "player:miss") {
         if (this.isMonsterAlive) {
-          this.currentPlayer.hp -= 3;
+          const damage = normalMonsterDamage(
+            this.currentMonster,
+            this.currentPlayer
+          );
+          this.currentPlayer.hp -= damage;
           this.receive("player:damage", {
-            value: 3,
+            value: damage,
           });
         }
       }
@@ -132,7 +136,7 @@ export default {
         }
 
         if (hit.type === "HEAL") {
-          const heal = hit.hitType === "BONUS" ? 50 : 10;
+          const heal = hit.hitType === "BONUS" ? 30 : 10;
           this.healPlayer(heal);
         }
 
@@ -153,7 +157,7 @@ export default {
             description,
           };
           // TODO: fix issue where ITEM target is hit after monster
-          // is defeated causing `this.currenctMonster` to be undefined
+          // is defeated causing `this.currentMonster` to be undefined
           // and .name/.element properties fail but needed to generate
           // this item. Maybe pass on target creation? cache?
           this.receive("item:get", item);
@@ -164,14 +168,23 @@ export default {
 
       if (data.type === "target:miss") {
         if (data.target.type === "DEFEND" && !this.isMissDisabled) {
-          const damage = normalMonsterDamage(
-            this.currentMonster,
-            this.currentPlayer
-          );
+          const damage =
+            2 * normalMonsterDamage(this.currentMonster, this.currentPlayer);
           this.currentPlayer.hp -= damage;
           this.receive("player:damage", {
             value: damage,
           });
+        }
+      }
+
+      if (data.type === "item:accept") {
+        switch (this.item.type) {
+          case "WEAPON":
+            this.currentPlayer.weapon = this.data.item;
+            break;
+          case "ARMOR":
+            this.playerObject.armor = this.data.item;
+            break;
         }
       }
     },

@@ -12,7 +12,7 @@
 <script>
 import Base from "./base.vue";
 export default {
-  name: "Worm",
+  name: "DragormSprite",
   components: {
     Base,
   },

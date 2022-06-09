@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "GameOver",
+  name: "GameOverSection",
   methods: {
     restart() {
       this.$emit("restart");

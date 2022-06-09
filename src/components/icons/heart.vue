@@ -12,7 +12,7 @@
 <script>
 import { calculateX, calculateY } from "../../utils";
 export default {
-  name: "Heart",
+  name: "HeartIcon",
   props: {
     angle: Number,
   },

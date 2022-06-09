@@ -5,8 +5,8 @@ export const normalPlayerDamage = (monster, player) => {
 }
 
 export const normalMonsterDamage = (monster, player) => {
-  const baseDamage = 1 + standardDamage(5, monster?.level ?? 0);
-  const playerDefense = standardDamage(3, player?.armor?.strength ?? 0);
+  const baseDamage = 1 + standardDamage(10, monster?.level ?? 0);
+  const playerDefense = standardDamage(1, player?.armor?.strength ?? 0);
   return Math.max(1, Math.round(baseDamage - playerDefense));
 }
 

@@ -20,7 +20,7 @@
 <script>
 import { calculateX, calculateY } from "../../utils";
 export default {
-  name: "Item",
+  name: "ItemIcon",
   props: {
     angle: Number,
   },

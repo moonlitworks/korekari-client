@@ -1,5 +1,11 @@
 <template>
-  <div>
+  <div id="spectate-section">
+    <!-- <div v-if="isSpectateMode">
+      <img id="spectator-icon" src="@/assets/spectator.png" />
+      <div>Spectator Mode is ON</div>
+      <div>[Q] to turn it off</div>
+    </div> -->
+
     <button @click.left.prevent="toggleSpectateMode">
       Spectate Mode: {{ isSpectateMode ? "ON" : "OFF" }}
     </button>
@@ -8,7 +14,7 @@
 
 <script>
 export default {
-  name: "Spectate",
+  name: "SpectateSection",
   props: {
     isSpectateMode: Boolean,
   },
@@ -21,14 +27,23 @@ export default {
 </script>
 
 <style scoped>
-div {
+#spectate-section {
   position: absolute;
   z-index: 20;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
-  left: 35px;
-  bottom: 150px;
+  right: 10px;
+  bottom: 40px;
+}
+
+#spectate-section > button {
+  padding: 5px;
+}
+
+#spectator-icon {
+  width: 50px;
+  opacity: 0.7;
 }
 </style>

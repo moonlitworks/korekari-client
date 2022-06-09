@@ -5,6 +5,7 @@
         v-if="!!playerObject"
         ref="player"
         :player="playerObject"
+        @acceptNewItem="acceptNewItem"
         @gameOver="setGameOver"
       />
     </transition>
@@ -28,7 +29,12 @@
       @missedTarget="missedTarget"
     />
     <Combo ref="combo" @lastCombo="registerCombo" />
-    <Interaction ref="interaction" @interaction="interaction" />
+    <Interaction
+      ref="interaction"
+      @interaction="interaction"
+      @acceptNewItemTrigger="acceptNewItemTrigger"
+      @rejectNewItemTrigger="rejectNewItemTrigger"
+    />
     <Spectate
       :isSpectateMode="isSpectateMode"
       @toggleSpectateMode="toggleSpectateMode"
@@ -211,12 +217,30 @@ export default {
       this.player?.setHp(newHp);
     },
     getItem(item) {
-      if (item.type === "WEAPON") {
-        this.playerObject.weapon = item;
+      this.player?.setNewItem(item);
+    },
+    acceptNewItem(item) {
+      switch (item.type) {
+        case "WEAPON":
+          this.playerObject.weapon = item;
+          break;
+        case "ARMOR":
+          this.playerObject.armor = item;
+          break;
       }
-      if (item.type === "ARMOR") {
-        this.playerObject.armor = item;
-      }
+      this.server.send({
+        type: "item:equip",
+        item,
+      });
+      this.interactionEl.focus();
+    },
+    acceptNewItemTrigger() {
+      this.player?.acceptNewItemTrigger();
+      this.interactionEl.focus();
+    },
+    rejectNewItemTrigger() {
+      this.player?.rejectNewItemTrigger();
+      this.interactionEl.focus();
     },
     monsterDying() {
       this.ring.targetList.forEach((x) => {

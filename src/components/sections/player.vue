@@ -28,16 +28,20 @@
         :colorTransformer="ephemeralText.colorTransformer"
       />
 
-      <Inventory
-        id="player-inventory"
-        :armor="player.armor"
-        :weapon="player.weapon"
-      />
-
       <div id="player-info">
         <div>{{ player.name }}</div>
       </div>
     </div>
+
+    <Inventory
+      id="player-inventory"
+      ref="player-inventory"
+      :armor="player.armor"
+      :weapon="player.weapon"
+      :newItem="newItem"
+      @acceptNewItem="acceptNewItem"
+      @declineNewItem="declineNewItem"
+    />
   </div>
 </template>
 
@@ -46,13 +50,13 @@ import DynamicRing from "../template/dynamic-ring.vue";
 import EphemeralText from "../template/ephemeral-text.vue";
 import Inventory from "./inventory.vue";
 export default {
-  name: "Player",
+  name: "PlayerSection",
   components: {
     DynamicRing,
     EphemeralText,
     Inventory,
   },
-  emits: ["gameOver"],
+  emits: ["gameOver", "acceptNewItem"],
   props: {
     player: {
       name: String,
@@ -76,6 +80,7 @@ export default {
         return "red";
       },
     },
+    newItem: undefined,
   }),
   mounted() {
     this.hp = this.player.maxHp;
@@ -87,6 +92,25 @@ export default {
     },
   },
   methods: {
+    acceptNewItem(item) {
+      this.$emit("acceptNewItem", item);
+      this.resetNewItem();
+    },
+    declineNewItem() {
+      this.resetNewItem();
+    },
+    acceptNewItemTrigger() {
+      this.$refs["player-inventory"].acceptNew();
+    },
+    rejectNewItemTrigger() {
+      this.$refs["player-inventory"].declineNew();
+    },
+    resetNewItem() {
+      this.$refs["player-inventory"].unsetNewItem();
+    },
+    setNewItem(item) {
+      this.$refs["player-inventory"].setNewItem(item);
+    },
     setHp(hp) {
       const difference = hp - this.hp;
       const newHp = Math.max(0, Math.min(hp, this.player.maxHp));
@@ -158,8 +182,8 @@ export default {
 
 #player-inventory {
   position: absolute;
-  display: flex;
-  left: 100px;
+  width: 100%;
+  height: 100%;
 }
 
 #hp-alert {

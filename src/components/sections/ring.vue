@@ -46,7 +46,7 @@ import { uuid } from "vue-uuid";
 import Target from "./target.vue";
 import Shadow from "./shadow.vue";
 export default {
-  name: "Ring",
+  name: "RingSection",
   components: {
     Target,
     Shadow,

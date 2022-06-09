@@ -13,7 +13,7 @@ import Heart from "../icons/heart.vue";
 import Shield from "../icons/shield.vue";
 import Item from "../icons/item.vue";
 export default {
-  name: "Target",
+  name: "TargetSection",
   components: {
     Arc,
   },

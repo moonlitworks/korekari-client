@@ -1,29 +1,33 @@
 <template>
   <div v-show="combo > 0" id="container">
     <div id="counter">Combo {{ combo }}</div>
-    <div id="timer" ref="timer" :class="{ shrink: shrink }"></div>
+    <Timer
+      ref="timer"
+      :width="120"
+      :duration="5"
+      :fromColor="'orangered'"
+      :toColor="'snow'"
+      @timeout="resetCombo"
+    />
   </div>
 </template>
 
 <script>
+import Timer from "../template/shrinking-timer.vue";
 export default {
-  name: "Combo",
+  name: "ComboSection",
+  emits: ["lastCombo"],
+  components: {
+    Timer,
+  },
   data: () => ({
     combo: 0,
     shrink: false,
   }),
-  mounted() {
-    this.$refs["timer"].addEventListener("animationend", () => {
-      this.resetCombo();
-    });
-  },
   methods: {
     addCombo() {
-      this.shrink = false;
-      requestAnimationFrame(() => {
-        this.shrink = true;
-        this.combo += 1;
-      });
+      this.combo += 1;
+      this.$refs["timer"].resetTimer();
     },
     resetCombo() {
       this.$emit("lastCombo", this.combo);

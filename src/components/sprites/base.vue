@@ -5,7 +5,7 @@
 <script>
 import { watch } from "vue";
 export default {
-  name: "Sprite",
+  name: "SpriteBase",
   props: {
     state: String,
     fps: Number,

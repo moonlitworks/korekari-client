@@ -48,7 +48,7 @@ import DynamicRing from "../template/dynamic-ring.vue";
 import EphemeralText from "../template/ephemeral-text.vue";
 import Worm from "../sprites/worm.vue";
 export default {
-  name: "Monster",
+  name: "MonsterSection",
   components: {
     DynamicRing,
     EphemeralText,

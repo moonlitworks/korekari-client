@@ -6,12 +6,14 @@
     tabindex="-1"
     @mousedown.left.prevent="interaction"
     @keydown.space.prevent="interaction"
+    @keydown.prevent="keyEnter"
   ></div>
 </template>
 
 <script>
 export default {
-  name: "Interaction",
+  name: "InteractionSection",
+  emits: ["interaction", "acceptNewItemTrigger", "rejectNewItemTrigger"],
   mounted() {
     this.focus();
   },
@@ -21,6 +23,16 @@ export default {
     },
     focus() {
       this.$refs["interaction-screen"].focus();
+    },
+    keyEnter(e) {
+      switch (e.key) {
+        case "z":
+          this.$emit("acceptNewItemTrigger");
+          break;
+        case "x":
+          this.$emit("rejectNewItemTrigger");
+          break;
+      }
     },
   },
 };

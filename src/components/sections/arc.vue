@@ -13,7 +13,7 @@
 <script>
 import { calculateX, calculateY, isLargeArc } from "../../utils";
 export default {
-  name: "Arc",
+  name: "ArcUnit",
   props: {
     arc: {
       radius: Number,
