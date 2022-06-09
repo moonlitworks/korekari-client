@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.7](https://github.com/moonlitworks/korekari-client/compare/v1.2.6...v1.2.7) (2022-06-09)
+
+
+### Bug Fixes
+
+* **core:** remove targets on gameover and set delay after rejoin ([b6054f7](https://github.com/moonlitworks/korekari-client/commit/b6054f7cc895ee271fa1c70817c00b5e250f36f3))
+
 ### [1.2.6](https://github.com/moonlitworks/korekari-client/compare/v1.2.5...v1.2.6) (2022-06-09)
 
 ### [1.2.5](https://github.com/moonlitworks/korekari-client/compare/v1.2.4...v1.2.5) (2022-06-09)
