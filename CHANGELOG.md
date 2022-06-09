@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/moonlitworks/korekari-client/compare/v1.1.1...v1.2.0) (2022-06-09)
+
+
+### Features
+
+* **inventory:** add accept and decline functionalities ([815f244](https://github.com/moonlitworks/korekari-client/commit/815f2440307ef2fa60f7a98e1cf455de6d959249))
+
 ### [1.1.1](https://github.com/moonlitworks/korekari-client/compare/v1.1.0...v1.1.1) (2022-06-06)
 
 ## [1.1.0](https://github.com/moonlitworks/korekari-client/compare/v1.0.1...v1.1.0) (2022-06-06)
