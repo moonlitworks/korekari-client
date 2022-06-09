@@ -51,8 +51,6 @@ jobs:
         name: Install dependencies
         with:
           cmd: install
-      - name: Build dist
-        run: yarn build
       - name: Get version
         id: version
         run: |
