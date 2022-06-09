@@ -51,10 +51,8 @@ jobs:
         name: Install dependencies
         with:
           cmd: install
-      - uses: borales/actions-yarn@v2.3.0
-        name: Build dist
-        with:
-          cmd: build
+      - name: Build dist
+        run: yarn build
       - name: Get version
         id: version
         run: |
