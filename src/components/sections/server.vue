@@ -1,13 +1,26 @@
 <template>
   <span id="connection-status">{{ connectionStatus }}</span>
+  <span v-if="appUpdated" id="app-updated"
+    >New content is available; please refresh.</span
+  >
 </template>
 
 <script>
 import { uuid } from "vue-uuid";
 import { normalPlayerDamage, normalMonsterDamage } from "../managers/dynamics";
 import { randomBetween } from "../../utils";
+import emitter from "@/services/emitter";
 export default {
   name: "ServerSection",
+  emits: [
+    "initGame",
+    "setMonster",
+    "playerDamage",
+    "playerDealt",
+    "playerHp",
+    "addTarget",
+    "getItem",
+  ],
   props: {
     gm: undefined,
   },
@@ -18,6 +31,7 @@ export default {
     currentPlayers: [],
     currentPlayer: undefined,
     currentMonster: undefined,
+    appUpdated: false,
   }),
   computed: {
     isMocked() {
@@ -33,6 +47,9 @@ export default {
       if (!this.isClientReady || !this.isMonsterAlive) return;
       this.generateMonsterEvent();
     }, 1000);
+    emitter.on("app:updated", () => {
+      this.appUpdated = true;
+    });
   },
   methods: {
     send(data) {
@@ -305,6 +322,13 @@ export default {
   position: absolute;
   right: 20px;
   top: 20px;
+  color: gray;
+}
+
+#app-updated {
+  position: absolute;
+  right: 20px;
+  top: 40px;
   color: gray;
 }
 </style>
