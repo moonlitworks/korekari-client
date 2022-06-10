@@ -1,11 +1,12 @@
 <template>
   <div>
     <component
+      id="sprite"
       :is="sprite"
       :class="{ critical: critical }"
       :state="state"
+      :fps="13"
       @setState="setState"
-      @dead="dead"
     ></component>
 
     <div id="monster-container">
@@ -144,14 +145,14 @@ export default {
       this.$refs["monster-hp"].setToPercent(this.hp / this.monster.maxHp, 0.5);
       this.$refs["hp-alert"].addText(difference);
     },
-    dead() {
-      this.isActive = false;
-      this.$emit("dead");
-    },
     setState(state) {
       // don't flinch when attacking, unless state is "COUNTERED"
       if (state === "FLINCHING" && this.state === "ATTACKING") return;
       if (this.state !== state) this.state = state;
+      if (state === "DEAD") {
+        this.isActive = false;
+        this.$emit("dead");
+      }
     },
   },
 };
