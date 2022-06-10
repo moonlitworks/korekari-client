@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/moonlitworks/korekari-client/compare/v1.2.7...v1.3.0) (2022-06-10)
+
+
+### Features
+
+* **sprites:** using transform for animation ([352260a](https://github.com/moonlitworks/korekari-client/commit/352260a52cd52f58bb50830d25906c2c9ca32a0c)), closes [#7](https://github.com/moonlitworks/korekari-client/issues/7)
+
 ### [1.2.7](https://github.com/moonlitworks/korekari-client/compare/v1.2.6...v1.2.7) (2022-06-09)
 
 
