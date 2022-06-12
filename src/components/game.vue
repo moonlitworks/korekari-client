@@ -1,23 +1,16 @@
 <template>
   <div id="game-screen">
-    <transition>
-      <Player
+    <Player />
+    <Monster />
+    <!-- <transition>
+      <PlayerOld
         v-if="!!playerObject"
         ref="player"
         :player="playerObject"
         @acceptNewItem="acceptNewItem"
         @gameOver="setGameOver"
       />
-    </transition>
-    <transition>
-      <Monster
-        v-if="!!monsterObject"
-        ref="monster"
-        :monster="monsterObject"
-        @dying="monsterDying"
-        @dead="monsterDead"
-      />
-    </transition>
+    </transition> -->
     <Ring
       ref="ring"
       :thickness="10"
@@ -29,47 +22,35 @@
       @missedTarget="missedTarget"
     />
     <Combo ref="combo" @lastCombo="registerCombo" />
-    <Interaction
-      ref="interaction"
-      @interaction="interaction"
-      @acceptNewItemTrigger="acceptNewItemTrigger"
-      @rejectNewItemTrigger="rejectNewItemTrigger"
-    />
+    <Interaction ref="interaction" @interaction="interaction" />
     <Spectate
       :isSpectateMode="isSpectateMode"
       @toggleSpectateMode="toggleSpectateMode"
     />
     <GameOver v-if="gameOver" @restart="startGame" />
-    <Server
-      ref="server"
-      :gm="this"
-      @initGame="initGame"
-      @setMonster="setMonster"
-      @playerDamage="playerDamage"
-      @playerDealt="playerDealt"
-      @playerHp="playerHp"
-      @addTarget="addTarget"
-      @getItem="getItem"
-    />
+    <Server />
   </div>
 </template>
 
 <script>
+import Monster from "./sections/monster/monster-base.vue";
+import Player from "./sections/player/player-base.vue";
+
 import Ring from "./sections/ring.vue";
-import Player from "./sections/player.vue";
-import Monster from "./sections/monster.vue";
 import Combo from "./sections/combo.vue";
 import Spectate from "./sections/spectate.vue";
 import GameOver from "./sections/game-over.vue";
 import Interaction from "./sections/interaction.vue";
 import Server from "./sections/server.vue";
+import emitter from "@/services/emitter";
 
 export default {
   name: "KoreKari",
   components: {
-    Ring,
-    Player,
     Monster,
+    Player,
+
+    Ring,
     Combo,
     Spectate,
     GameOver,
@@ -86,14 +67,6 @@ export default {
     playerObject: undefined,
   }),
   computed: {
-    player() {
-      if (!this.playerObject) return undefined;
-      return this.$refs["player"];
-    },
-    monster() {
-      if (!this.monsterObject) return undefined;
-      return this.$refs["monster"];
-    },
     monsterIsAlive() {
       if (!this.monsterObject) return false;
       return !!this.monster && this.monster.isAlive;
@@ -108,20 +81,8 @@ export default {
     interactionEl() {
       return this.$refs["interaction"];
     },
-    server() {
-      return this.$refs["server"];
-    },
-  },
-  mounted() {
-    this.startGame();
   },
   methods: {
-    startGame() {
-      this.server.send({
-        type: "player:register",
-        name: "Hunter",
-      });
-    },
     restartAnimation(cb) {
       requestAnimationFrame(() => cb());
     },
@@ -160,7 +121,8 @@ export default {
       this.interactionEl.focus();
     },
     addTarget(data) {
-      if (data.type === "DEFEND") this.monster?.setState("ATTACKING");
+      if (data.type === "DEFEND")
+        emitter.emit("monster:state:set", "ATTACKING");
       if (!this.monsterObject || this.isSpectateMode || !this.acceptingTargets)
         return;
       const lifetime = data.expiry - new Date();
@@ -213,41 +175,6 @@ export default {
     },
     setMonster(monsterObject) {
       this.monsterObject = monsterObject;
-    },
-    playerDamage(damage) {
-      this.player?.receiveDamage(damage);
-    },
-    playerDealt({ value, isCritical, isCounter }) {
-      this.monster?.receiveDamage(value, isCritical, isCounter);
-    },
-    playerHp(newHp) {
-      this.player?.setHp(newHp);
-    },
-    getItem(item) {
-      this.player?.setNewItem(item);
-    },
-    acceptNewItem(item) {
-      switch (item.type) {
-        case "WEAPON":
-          this.playerObject.weapon = item;
-          break;
-        case "ARMOR":
-          this.playerObject.armor = item;
-          break;
-      }
-      this.server.send({
-        type: "item:equip",
-        item,
-      });
-      this.interactionEl.focus();
-    },
-    acceptNewItemTrigger() {
-      this.player?.acceptNewItemTrigger();
-      this.interactionEl.focus();
-    },
-    rejectNewItemTrigger() {
-      this.player?.rejectNewItemTrigger();
-      this.interactionEl.focus();
     },
     monsterDying() {
       this.ring.targetList.forEach((x) => {

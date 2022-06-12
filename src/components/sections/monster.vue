@@ -47,7 +47,7 @@
 import { shallowRef } from "vue";
 import DynamicRing from "../template/dynamic-ring.vue";
 import EphemeralText from "../template/ephemeral-text.vue";
-import Worm from "../sprites/worm.vue";
+import Worm from "../sprites/dragorm.vue";
 export default {
   name: "MonsterSection",
   components: {

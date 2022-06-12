@@ -21,7 +21,6 @@
 import {
   ref,
   defineComponent,
-  defineEmits,
   defineProps,
   onMounted,
   reactive,
@@ -29,12 +28,11 @@ import {
   watch,
 } from "vue";
 import resetAnimation from "@/services/reset-animation";
+import emitter from "@/services/emitter";
 
 const sprite = ref();
 const spriteState = ref("IDLE");
 const isAnimated = ref(true);
-
-const emit = defineEmits(["setState"]);
 
 const props = defineProps({
   fps: { type: Number, required: true },
@@ -172,23 +170,9 @@ function handleStateChange(newState) {
   );
 }
 
-function transitionState(fromState) {
-  switch (fromState) {
-    case "FLINCHING":
-    case "COUNTERED":
-    case "ATTACKING":
-    case "ENTERING":
-      emit("setState", "IDLE");
-      break;
-    case "DYING":
-      emit("setState", "DEAD");
-      break;
-  }
-}
-
 onMounted(() => {
   sprite.value.addEventListener("animationend", () => {
-    transitionState(spriteState.value);
+    emitter.emit("monster:sprite:animation:end");
   });
   setSpriteByState(props.state, true);
 });

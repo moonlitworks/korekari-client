@@ -12,18 +12,6 @@ import { randomBetween } from "../../utils";
 import emitter from "@/services/emitter";
 export default {
   name: "ServerSection",
-  emits: [
-    "initGame",
-    "setMonster",
-    "playerDamage",
-    "playerDealt",
-    "playerHp",
-    "addTarget",
-    "getItem",
-  ],
-  props: {
-    gm: undefined,
-  },
   data: () => ({
     connectionStatus: "MOCKED",
     isClientReady: false,
@@ -43,13 +31,15 @@ export default {
   },
   mounted() {
     this.generateMonster(1);
-    setInterval(() => {
-      if (!this.isClientReady || !this.isMonsterAlive) return;
-      this.generateMonsterEvent();
-    }, 1000);
+    // setInterval(() => {
+    //   if (!this.isClientReady || !this.isMonsterAlive) return;
+    //   this.generateMonsterEvent();
+    // }, 1000);
     emitter.on("app:updated", () => {
       this.appUpdated = true;
     });
+    const newPlayer = this.generateNewPlayer({ name: "Hunter" });
+    emitter.emit("player:set", newPlayer);
   },
   methods: {
     send(data) {
@@ -66,10 +56,12 @@ export default {
         this.currentPlayers.push(newPlayer);
         this.currentPlayer = newPlayer;
         this.isClientReady = true;
-        this.receive("game:init", {
-          player: newPlayer,
-          monster: this.currentMonster,
-        });
+        // this.receive("game:init", {
+        //   player: newPlayer,
+        //   monster: this.currentMonster,
+        // });
+
+        emitter.emit("player:set", newPlayer);
         return;
       }
 
@@ -244,9 +236,10 @@ export default {
       };
     },
     generateMonster(level) {
-      this.currentMonster = {
+      const newMonster = {
         id: uuid.v4(),
         name: "Dragorm",
+        type: "DRAGORM",
         level,
         hp: 100,
         maxHp: 100,
@@ -268,7 +261,8 @@ export default {
           },
         ],
       };
-      this.$emit("setMonster", this.currentMonster);
+      this.currentMonster = newMonster;
+      emitter.emit("monster:set", newMonster);
     },
     generateMonsterEvent() {
       const now = new Date();
@@ -293,6 +287,9 @@ export default {
           normal: this.currentMonster.level + randomBetween(1, 4),
         },
       };
+
+      if (target.type === "DEFEND")
+        emitter.emit("monster:state:set", "ATTACKING");
 
       this.receive("target:add", target);
     },
