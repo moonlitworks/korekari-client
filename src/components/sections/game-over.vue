@@ -7,15 +7,17 @@
   </div>
 </template>
 
-<script>
-export default {
+<script setup>
+import { defineComponent } from "vue";
+import emitter from "@/services/emitter";
+
+defineComponent({
   name: "GameOverSection",
-  methods: {
-    restart() {
-      this.$emit("restart");
-    },
-  },
-};
+});
+
+function restart() {
+  emitter.emit("restart");
+}
 </script>
 
 <style scoped>

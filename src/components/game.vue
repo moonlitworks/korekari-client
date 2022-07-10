@@ -2,15 +2,6 @@
   <div id="game-screen">
     <Player />
     <Monster />
-    <!-- <transition>
-      <PlayerOld
-        v-if="!!playerObject"
-        ref="player"
-        :player="playerObject"
-        @acceptNewItem="acceptNewItem"
-        @gameOver="setGameOver"
-      />
-    </transition> -->
     <Ring
       ref="ring"
       :thickness="10"
@@ -19,10 +10,9 @@
       :ringOpacity="0.1"
       :pointerColor="'red'"
       :showCenter="showCenter"
-      @missedTarget="missedTarget"
     />
     <Combo ref="combo" @lastCombo="registerCombo" />
-    <Interaction ref="interaction" @interaction="interaction" />
+    <Interaction ref="interaction" />
     <Spectate
       :isSpectateMode="isSpectateMode"
       @toggleSpectateMode="toggleSpectateMode"
@@ -33,16 +23,17 @@
 </template>
 
 <script>
+import emitter from "@/services/emitter";
+
+import Server from "./server.vue";
+
+import Ring from "./sections/ring/ring-base.vue";
 import Monster from "./sections/monster/monster-base.vue";
 import Player from "./sections/player/player-base.vue";
-
-import Ring from "./sections/ring.vue";
-import Combo from "./sections/combo.vue";
+import Combo from "./sections/player/combo.vue";
+import Interaction from "./sections/player/interaction.vue";
 import Spectate from "./sections/spectate.vue";
 import GameOver from "./sections/game-over.vue";
-import Interaction from "./sections/interaction.vue";
-import Server from "./sections/server.vue";
-import emitter from "@/services/emitter";
 
 export default {
   name: "KoreKari",
@@ -62,7 +53,7 @@ export default {
     highestCombo: 0,
     gameOver: false,
     isSpectateMode: false,
-    acceptingTargets: false,
+    acceptingTargets: true,
     monsterObject: undefined,
     playerObject: undefined,
   }),
@@ -81,6 +72,19 @@ export default {
     interactionEl() {
       return this.$refs["interaction"];
     },
+  },
+  mounted() {
+    emitter.on("interaction", this.interaction);
+    emitter.on("target:add", this.addTarget);
+    emitter.on("player:set", (player) => {
+      this.playerObject = player;
+    });
+    emitter.on("game:init", this.initGame);
+    setTimeout(() => {
+      emitter.emit("player:register", {
+        name: "Test",
+      });
+    }, 3000);
   },
   methods: {
     restartAnimation(cb) {
@@ -102,12 +106,12 @@ export default {
       if (hitInfo.hits.length <= 0) {
         // dont damage player if no target is in ring
         if (this.monsterIsAlive) {
-          this.server.send({ type: "player:miss" });
+          emitter.emit("server:send", { type: "player:miss" });
           this.combo?.resetCombo();
         }
       } else {
         hitInfo.hits.forEach((hit) => {
-          this.server.send({ type: "target:hit", hit });
+          emitter.emit("server:send", { type: "target:hit", hit });
           this.combo?.addCombo();
           this.ring.hitTarget(hit.id);
         });
@@ -157,7 +161,7 @@ export default {
     missedTarget(target) {
       if (this.isSpectateMode) return;
       if ([undefined, "DEAD", "DYING"].includes(this.monster?.state)) return;
-      this.server.send({ type: "target:miss", target });
+      emitter.emit("server:send", { type: "target:miss", target });
     },
     initGame({ player, monster }) {
       this.playerObject = undefined;

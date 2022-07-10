@@ -16,42 +16,45 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { defineComponent, defineProps, defineExpose, ref } from "vue";
 import { uuid } from "vue-uuid";
 import EphemeralTextUnit from "./ephemeral-text-unit.vue";
-export default {
+
+defineComponent({
   name: "EphemeralText",
   components: {
     EphemeralTextUnit,
   },
-  props: {
-    duration: Number,
-    endXPosition: String,
-    endYPosition: String,
-    textTransformer: undefined,
-    colorTransformer: undefined,
-  },
-  data: () => ({
-    textList: [],
-  }),
-  computed: {
-    texts() {
-      return this.$refs["unit"];
-    },
-  },
-  methods: {
-    addText(value, color) {
-      this.textList.push({
-        id: uuid.v4(),
-        text: this.textTransformer?.(value) ?? value,
-        color: this.colorTransformer?.(value) ?? color,
-      });
-    },
-    removeTextById(id) {
-      this.textList = this.textList.filter((x) => x.id !== id);
-    },
-  },
-};
+});
+
+defineProps({
+  duration: Number,
+  endXPosition: String,
+  endYPosition: String,
+  textTransformer: undefined,
+  colorTransformer: undefined,
+});
+
+const unit = ref();
+const textList = ref([]);
+
+function addText(value, color) {
+  this.textList.push({
+    id: uuid.v4(),
+    text: this.textTransformer?.(value) ?? value,
+    color: this.colorTransformer?.(value) ?? color,
+  });
+}
+
+function removeTextById(id) {
+  textList.value = textList.value.filter((x) => x.id !== id);
+}
+
+defineExpose({
+  addText,
+  removeTextById,
+});
 </script>
 
 <style scoped>

@@ -12,18 +12,24 @@
   </div>
 </template>
 
-<script>
-export default {
+<script setup>
+import { defineComponent, defineProps, defineExpose } from "vue";
+
+defineComponent({
   name: "SpectateSection",
-  props: {
-    isSpectateMode: Boolean,
-  },
-  methods: {
-    toggleSpectateMode() {
-      this.$emit("toggleSpectateMode");
-    },
-  },
-};
+});
+
+defineProps({
+  isSpectateMode: Boolean,
+});
+
+function toggleSpectateMode() {
+  this.$emit("toggleSpectateMode");
+}
+
+defineExpose({
+  toggleSpectateMode,
+});
 </script>
 
 <style scoped>

@@ -20,7 +20,6 @@
             <button @click.left.prevent="declineNew">Decline [X]</button>
           </div>
         </div>
-        <!-- <div id="current">Current item</div> -->
       </div>
     </transition>
     <div id="inventory">
@@ -42,45 +41,58 @@
   </div>
 </template>
 
-<script>
-import Timer from "../template/shrinking-timer.vue";
-export default {
+<script setup>
+import { defineComponent, defineProps, defineExpose, ref } from "vue";
+import emitter from "@/services/emitter";
+import Timer from "../../template/shrinking-timer.vue";
+
+defineComponent({
   name: "InventorySection",
   components: {
     Timer,
   },
-  emits: ["acceptNewItem", "declineNewItem"],
-  props: {
-    weapon: {
-      name: String,
-      description: String,
-      strength: Number,
-    },
-    armor: {
-      name: String,
-      description: String,
-      strength: Number,
-    },
+});
+
+defineProps({
+  weapon: {
+    name: String,
+    description: String,
+    strength: Number,
   },
-  data: () => ({
-    newItem: undefined,
-  }),
-  methods: {
-    setNewItem(item) {
-      this.newItem = item;
-      this.$refs["newItemTimer"]?.resetTimer();
-    },
-    unsetNewItem() {
-      this.newItem = undefined;
-    },
-    acceptNew() {
-      if (this.newItem) this.$emit("acceptNewItem", this.newItem);
-    },
-    declineNew() {
-      if (this.newItem) this.$emit("declineNewItem", this.newItem);
-    },
+  armor: {
+    name: String,
+    description: String,
+    strength: Number,
   },
-};
+});
+
+const newItem = ref(undefined);
+
+function setNewItem(item) {
+  this.newItem = item;
+  this.$refs["newItemTimer"]?.resetTimer();
+}
+
+function unsetNewItem() {
+  this.newItem = undefined;
+}
+
+function acceptNew() {
+  if (newItem.value) {
+    emitter.emit("item:accept", newItem.value);
+  }
+}
+
+function declineNew() {
+  if (newItem.value) {
+    emitter.emit("item:reject", newItem.value);
+  }
+}
+
+defineExpose({
+  setNewItem,
+  unsetNewItem,
+});
 </script>
 
 <style scoped>

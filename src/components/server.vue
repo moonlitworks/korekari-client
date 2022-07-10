@@ -7,8 +7,8 @@
 
 <script>
 import { uuid } from "vue-uuid";
-import { normalPlayerDamage, normalMonsterDamage } from "../managers/dynamics";
-import { randomBetween } from "../../utils";
+import { normalPlayerDamage, normalMonsterDamage } from "@/services/dynamics";
+import { randomBetween } from "../utils";
 import emitter from "@/services/emitter";
 export default {
   name: "ServerSection",
@@ -31,15 +31,31 @@ export default {
   },
   mounted() {
     this.generateMonster(1);
-    // setInterval(() => {
-    //   if (!this.isClientReady || !this.isMonsterAlive) return;
-    //   this.generateMonsterEvent();
-    // }, 1000);
+    setInterval(() => {
+      if (!this.isClientReady || !this.isMonsterAlive) return;
+      this.generateMonsterEvent();
+    }, 1000);
     emitter.on("app:updated", () => {
       this.appUpdated = true;
     });
     const newPlayer = this.generateNewPlayer({ name: "Hunter" });
     emitter.emit("player:set", newPlayer);
+
+    emitter.on("server:send", this.send.bind(this));
+    emitter.on("server:receive", this.receive.bind(this));
+
+    emitter.on("player:register", (data) => {
+      const newPlayer = this.generateNewPlayer(data);
+      this.currentPlayers.push(newPlayer);
+      this.currentPlayer = newPlayer;
+      this.isClientReady = true;
+      this.receive("game:init", {
+        player: newPlayer,
+        monster: this.currentMonster,
+      });
+
+      emitter.emit("player:set", newPlayer);
+    });
   },
   methods: {
     send(data) {
@@ -56,10 +72,10 @@ export default {
         this.currentPlayers.push(newPlayer);
         this.currentPlayer = newPlayer;
         this.isClientReady = true;
-        // this.receive("game:init", {
-        //   player: newPlayer,
-        //   monster: this.currentMonster,
-        // });
+        this.receive("game:init", {
+          player: newPlayer,
+          monster: this.currentMonster,
+        });
 
         emitter.emit("player:set", newPlayer);
         return;
@@ -200,28 +216,32 @@ export default {
     mockReceive(event, data) {
       if (event === "game:init") {
         this.$emit("initGame", data);
+        emitter.emit(event, data);
       }
 
       if (event === "player:damage") {
-        this.$emit("playerDamage", data.value);
+        emitter.emit(event, data);
       }
 
       if (event === "player:dealt") {
         this.$emit("playerDealt", data);
+        emitter.emit(event, data);
       }
 
       if (event === "player:hp") {
         this.$emit("playerHp", data.value);
+        emitter.emit(event, data.value);
       }
 
       if (event === "target:add") {
         const { playerId, ...targetData } = data;
         if (this.currentPlayer.id !== playerId) return;
-        this.$emit("addTarget", targetData);
+        emitter.emit("target:add", targetData);
       }
 
       if (event === "item:get") {
         this.$emit("getItem", data);
+        emitter.emit(event, data);
       }
     },
 
@@ -277,6 +297,7 @@ export default {
 
       const target = {
         id: uuid.v4(),
+        angle: Math.round(Math.random() * 359),
         type,
         expiry: now.setSeconds(now.getSeconds() + 3),
         playerId: this.currentPlayer.id,

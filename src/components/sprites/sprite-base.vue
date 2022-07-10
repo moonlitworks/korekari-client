@@ -30,6 +30,11 @@ import {
 import resetAnimation from "@/services/reset-animation";
 import emitter from "@/services/emitter";
 
+defineComponent({
+  name: "SpriteBase",
+  inheritAttrs: false,
+});
+
 const sprite = ref();
 const spriteState = ref("IDLE");
 const isAnimated = ref(true);
@@ -175,11 +180,6 @@ onMounted(() => {
     emitter.emit("monster:sprite:animation:end");
   });
   setSpriteByState(props.state, true);
-});
-
-defineComponent({
-  name: "SpriteBase",
-  inheritAttrs: false,
 });
 </script>
 

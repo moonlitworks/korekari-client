@@ -19,7 +19,7 @@
 
     <DynamicRingArc
       id="arc"
-      ref="arc"
+      ref="arcElement"
       :radius="radius"
       :width="width"
       :color="arc?.color ?? 'white'"
@@ -35,77 +35,72 @@
   </svg>
 </template>
 
-<script>
+<script setup>
+import { defineComponent, defineProps, defineExpose, ref, computed } from "vue";
 import DynamicRingArc from "./dynamic-ring-arc.vue";
-export default {
+
+defineComponent({
   name: "DynamicRing",
   components: {
     DynamicRingArc,
   },
-  props: {
-    side: Number,
-    width: Number,
+});
+
+const props = defineProps({
+  side: Number,
+  width: Number,
+  color: String,
+  opacity: Number,
+  backring: {
     color: String,
     opacity: Number,
-    backring: {
-      color: String,
-      opacity: Number,
-      width: Number,
-    },
-    arc: {
-      color: String,
-      opacity: Number,
-      shadow: Number,
-      linecap: String,
-      startAngle: Number,
-      startPercent: Number,
-      startSpeed: Number,
-    },
+    width: Number,
   },
-  computed: {
-    radius() {
-      return this.side / 2;
-    },
-    boxSize() {
-      return `${this.side}px`;
-    },
-    viewBox() {
-      return `0 0 ${this.side} ${this.side}`;
-    },
-    ringRadius() {
-      return `${this.radius}px`;
-    },
-    ringColor() {
-      return this.color;
-    },
-    ringOpacity() {
-      return this.opacity;
-    },
-    ringWidth() {
-      return `${this.width}px`;
-    },
-    backringColor() {
-      if (!this.backring) return undefined;
-      return this.backring.color;
-    },
-    backringOpacity() {
-      if (!this.backring) return undefined;
-      return this.backring.opacity;
-    },
-    backringWidth() {
-      if (!this.backring) return undefined;
-      return `${this.backring.width}px`;
-    },
+  arc: {
+    color: String,
+    opacity: Number,
+    shadow: Number,
+    linecap: String,
+    startAngle: Number,
+    startPercent: Number,
+    startSpeed: Number,
   },
-  methods: {
-    setToAngle(angle, speed) {
-      this.$refs["arc"].setToAngle(angle, speed);
-    },
-    setToPercent(percent, speed) {
-      this.$refs["arc"].setToPercent(percent, speed);
-    },
-  },
-};
+});
+
+const arcElement = ref();
+
+const radius = computed(() => props.side / 2);
+const boxSize = computed(() => `${props.side}px`);
+const viewBox = computed(() => `0 0 ${props.side} ${props.side}`);
+const ringRadius = computed(() => `${radius.value}px`);
+const ringColor = computed(() => props.color);
+const ringOpacity = computed(() => props.opacity);
+const ringWidth = computed(() => `${props.width}px`);
+const backringColor = computed(() => {
+  if (!props.backring) return undefined;
+  return props.backring.color;
+});
+const backringOpacity = computed(() => {
+  if (!props.backring) return undefined;
+  return props.backring.opacity;
+});
+const backringWidth = computed(() => {
+  if (!props.backring) return undefined;
+  return `${props.backring.width}px`;
+});
+
+function setToAngle(angle, speed) {
+  arcElement.value.setToAngle(angle, speed);
+}
+
+function setToPercent(percent, speed) {
+  arcElement.value.setToPercent(percent, speed);
+}
+
+defineExpose({
+  setToAngle,
+  setToPercent,
+});
 </script>
 
 <style>

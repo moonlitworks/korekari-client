@@ -9,28 +9,29 @@
   />
 </template>
 
-<script>
-import { calculateX, calculateY } from "../../utils";
-export default {
+<script setup>
+import { computed, defineComponent, defineProps, ref } from "vue";
+import { calculateX, calculateY } from "@/services/angle";
+
+defineComponent({
   name: "HeartIcon",
-  props: {
-    angle: Number,
-  },
-  data: () => ({
-    translateOffset: 53,
-  }),
-  computed: {
-    transform() {
-      return `translateX(${calculateX(
-        this.angle,
-        this.translateOffset
-      )}%) translateY(${calculateY(
-        this.angle,
-        this.translateOffset
-      )}%) scale(0.07)`;
-    },
-  },
-};
+});
+
+const props = defineProps({
+  angle: Number,
+});
+
+const translateOffset = ref(53);
+const scale = ref(0.06);
+
+const transform = computed(() => {
+  return `translateX(${calculateX(
+    props.angle,
+    translateOffset.value
+  )}%) translateY(${calculateY(props.angle, translateOffset.value)}%) scale(${
+    scale.value
+  })`;
+});
 </script>
 
 <style scoped>

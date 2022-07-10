@@ -2,33 +2,46 @@
   <div id="timer" ref="timer" :class="{ shrink: shrink }"></div>
 </template>
 
-<script>
-export default {
+<script setup>
+import {
+  defineComponent,
+  defineProps,
+  defineEmits,
+  defineExpose,
+  onMounted,
+  ref,
+} from "vue";
+defineComponent({
   name: "ShrinkingTimer",
-  emits: ["timeout"],
-  props: {
-    duration: Number,
-    width: Number,
-    fromColor: String,
-    toColor: String,
-  },
-  data: () => ({
-    shrink: true,
-  }),
-  mounted() {
-    this.$refs["timer"].addEventListener("animationend", () => {
-      this.$emit("timeout");
-    });
-  },
-  methods: {
-    resetTimer() {
-      this.shrink = false;
-      requestAnimationFrame(() => {
-        this.shrink = true;
-      });
-    },
-  },
-};
+});
+
+defineProps({
+  duration: Number,
+  width: Number,
+  fromColor: String,
+  toColor: String,
+});
+
+const emit = defineEmits(["timeout"]);
+const shrink = ref(true);
+
+const timer = ref();
+onMounted(() => {
+  timer.value.addEventListener("animationend", () => {
+    emit("timeout");
+  });
+});
+
+function resetTimer() {
+  shrink.value = false;
+  requestAnimationFrame(() => {
+    shrink.value = true;
+  });
+}
+
+defineExpose({
+  resetTimer,
+});
 </script>
 
 <style>

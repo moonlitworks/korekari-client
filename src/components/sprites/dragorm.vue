@@ -2,38 +2,43 @@
   <SpriteBase :idle="idle" :attack="attack" :flinch="flinch" :death="death" />
 </template>
 
-<script>
+<script setup>
+import { defineComponent, reactive } from "vue";
 import SpriteBase from "./sprite-base.vue";
-export default {
+
+defineComponent({
   name: "DragormSprite",
+  inheritAttrs: false,
   components: {
     SpriteBase,
   },
-  data: () => ({
-    idle: {
-      image: require("@/assets/sprites/worm/idle.png"),
-      width: 900,
-      height: 900,
-      cuts: 9,
-    },
-    attack: {
-      image: require("@/assets/sprites/worm/attack.png"),
-      width: 900,
-      height: 900,
-      cuts: 16,
-    },
-    flinch: {
-      image: require("@/assets/sprites/worm/flinch.png"),
-      width: 900,
-      height: 900,
-      cuts: 3,
-    },
-    death: {
-      image: require("@/assets/sprites/worm/death.png"),
-      width: 900,
-      height: 900,
-      cuts: 8,
-    },
-  }),
-};
+});
+
+const idle = reactive({
+  image: require("@/assets/sprites/worm/idle.png"),
+  width: 900,
+  height: 900,
+  cuts: 9,
+});
+
+const attack = reactive({
+  image: require("@/assets/sprites/worm/attack.png"),
+  width: 900,
+  height: 900,
+  cuts: 16,
+});
+
+const flinch = reactive({
+  image: require("@/assets/sprites/worm/flinch.png"),
+  width: 900,
+  height: 900,
+  cuts: 3,
+});
+
+const death = reactive({
+  image: require("@/assets/sprites/worm/death.png"),
+  width: 900,
+  height: 900,
+  cuts: 8,
+});
 </script>

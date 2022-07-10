@@ -12,30 +12,37 @@
   </div>
 </template>
 
-<script>
-import Timer from "../template/shrinking-timer.vue";
-export default {
+<script setup>
+import { defineComponent, defineExpose, ref } from "vue";
+import emitter from "@/services/emitter";
+import Timer from "../../template/shrinking-timer.vue";
+
+defineComponent({
   name: "ComboSection",
-  emits: ["lastCombo"],
   components: {
     Timer,
   },
-  data: () => ({
-    combo: 0,
-    shrink: false,
-  }),
-  methods: {
-    addCombo() {
-      this.combo += 1;
-      this.$refs["timer"].resetTimer();
-    },
-    resetCombo() {
-      this.$emit("lastCombo", this.combo);
-      this.combo = 0;
-      this.shrink = false;
-    },
-  },
-};
+});
+
+const timer = ref();
+const combo = ref(0);
+const shrink = ref(false);
+
+function addCombo() {
+  combo.value += 1;
+  timer.value.resetTimer();
+}
+
+function resetCombo() {
+  emitter.emit("lastCombo", combo.value);
+  combo.value = 0;
+  shrink.value = false;
+}
+
+defineExpose({
+  addCombo,
+  resetCombo,
+});
 </script>
 
 <style scoped>

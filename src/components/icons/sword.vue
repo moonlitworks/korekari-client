@@ -9,28 +9,29 @@
   />
 </template>
 
-<script>
-import { calculateX, calculateY } from "../../utils";
-export default {
+<script setup>
+import { defineComponent, defineProps, ref, computed } from "vue";
+import { calculateX, calculateY } from "@/services/angle";
+
+defineComponent({
   name: "SwordIcon",
-  props: {
-    angle: Number,
-  },
-  data: () => ({
-    translateOffset: 53,
-  }),
-  computed: {
-    transform() {
-      return `translateX(${calculateX(
-        this.angle,
-        this.translateOffset
-      )}%) translateY(${calculateY(
-        this.angle,
-        this.translateOffset
-      )}%) scale(0.07) rotate(30deg)`;
-    },
-  },
-};
+});
+
+const props = defineProps({
+  angle: Number,
+});
+
+const translateOffset = ref(53);
+const scale = ref(0.07);
+
+const transform = computed(() => {
+  return `translateX(${calculateX(
+    props.angle,
+    translateOffset.value
+  )}%) translateY(${calculateY(props.angle, translateOffset.value)}%) scale(${
+    scale.value
+  }) rotate(30deg)`;
+});
 </script>
 
 <style scoped>

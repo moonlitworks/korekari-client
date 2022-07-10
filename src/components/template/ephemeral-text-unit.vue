@@ -4,23 +4,30 @@
   </div>
 </template>
 
-<script>
-export default {
+<script setup>
+import { defineComponent, defineProps, defineEmits, onMounted, ref } from "vue";
+defineComponent({
   name: "EphemeralTextUnit",
-  props: {
-    id: String,
-    text: String,
-    color: String,
-    duration: Number,
-    endXPosition: String,
-    endYPosition: String,
-  },
-  mounted() {
-    this.$refs["unit"].addEventListener("animationend", () => {
-      this.$emit("end", this.id);
-    });
-  },
-};
+});
+
+const props = defineProps({
+  id: String,
+  text: String,
+  color: String,
+  duration: Number,
+  endXPosition: String,
+  endYPosition: String,
+});
+
+const emit = defineEmits(["end"]);
+
+const unit = ref();
+
+onMounted(() => {
+  unit.value.addEventListener("animationend", () => {
+    emit("end", props.id);
+  });
+});
 </script>
 
 <style scoped>

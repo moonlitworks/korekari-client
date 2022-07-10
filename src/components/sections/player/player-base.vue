@@ -45,12 +45,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, defineComponent, computed } from "vue";
+import { ref, reactive, defineComponent, computed, onMounted } from "vue";
 import emitter from "@/services/emitter";
 import clamp from "@/services/clamp";
 import DynamicRing from "../../template/dynamic-ring.vue";
 import EphemeralText from "../../template/ephemeral-text.vue";
-import Inventory from "../inventory.vue";
+import Inventory from "./inventory.vue";
+
+defineComponent({
+  name: "PlayerBase",
+  components: {
+    DynamicRing,
+    EphemeralText,
+    Inventory,
+  },
+});
 
 const playerHp = ref(null);
 const hpAlert = ref(null);
@@ -84,15 +93,9 @@ function setPlayerHp(hp, showAlert = true) {
   if (showAlert) hpAlert.value.addText(difference);
 }
 
-emitter.on("player:set", setPlayer);
-
-defineComponent({
-  name: "PlayerBase",
-  components: {
-    DynamicRing,
-    EphemeralText,
-    Inventory,
-  },
+onMounted(() => {
+  emitter.on("player:set", setPlayer);
+  emitter.on("player:hp", setPlayerHp);
 });
 </script>
 
